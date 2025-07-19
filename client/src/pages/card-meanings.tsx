@@ -80,9 +80,9 @@ export default function CardMeanings() {
                 {filteredCards.map((card) => (
                   <Card key={card.id} className="border-muted">
                     <CardContent className="p-6">
-                      <div className="flex gap-6">
+                      <div className="flex flex-col items-center space-y-4">
                         {card.imageUrl && (
-                          <div className="w-24 h-36 rounded border overflow-hidden flex-shrink-0">
+                          <div className="w-32 h-48 rounded border overflow-hidden flex-shrink-0">
                             <img
                               src={card.imageUrl.replace('@assets/', '/attached_assets/')}
                               alt={card.name}
@@ -95,10 +95,10 @@ export default function CardMeanings() {
                           </div>
                         )}
                         
-                        <div className="flex-1 space-y-3">
-                          <div>
+                        <div className="w-full space-y-3">
+                          <div className="text-center">
                             <h3 className="text-xl font-semibold text-teal-700 mb-2">{card.name}</h3>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center gap-2">
                               <Badge variant={card.arcana === 'Major' ? 'default' : 'secondary'}>
                                 {card.arcana} Arcana
                               </Badge>
