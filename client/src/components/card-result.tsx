@@ -67,9 +67,18 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
       <div className="space-y-4">
         <div>
           <h4 className="text-lg font-serif font-semibold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>Meaning</h4>
-          <p className="text-foreground/90 text-sm leading-relaxed whitespace-pre-line">
-            {card.meaning}
-          </p>
+          <div className="text-foreground/90 text-sm leading-relaxed">
+            {card.meaning.split('. ').map((sentence, index, array) => {
+              if (index === array.length - 1) {
+                return <span key={index}>{sentence}</span>;
+              }
+              return (
+                <span key={index}>
+                  {sentence}.{(index + 1) % 3 === 0 ? <><br /><br /></> : ' '}
+                </span>
+              );
+            })}
+          </div>
         </div>
         
 
