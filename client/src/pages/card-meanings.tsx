@@ -4,8 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import NavigationMenu from "@/components/navigation-menu";
 import { Search } from "lucide-react";
 import type { TarotCard } from "@shared/schema";
+import tarotopiaLogo from "@assets/Tarotopia-01_1752963540547.png";
 
 export default function CardMeanings() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -54,8 +56,23 @@ export default function CardMeanings() {
     .sort((a, b) => getSortOrder(a) - getSortOrder(b));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-rose-50 to-teal-50 p-4">
-      <div className="max-w-4xl mx-auto pt-16">
+    <div className="min-h-screen ethereal-gradient">
+      {/* Header */}
+      <header className="relative z-10 px-4 py-6">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <NavigationMenu />
+          <div className="flex-1 flex justify-center">
+            <img 
+              src={tarotopiaLogo} 
+              alt="Tarotopia Logo" 
+              className="w-36 h-36 object-contain"
+            />
+          </div>
+        </div>
+      </header>
+      
+      <main className="relative z-10 px-4 pb-8">
+        <div className="max-w-4xl mx-auto">
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-2xl text-center text-teal-700">Card Meanings Guide</CardTitle>
@@ -148,7 +165,8 @@ export default function CardMeanings() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
