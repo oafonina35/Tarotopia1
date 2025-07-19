@@ -26,11 +26,13 @@ Preferred communication style: Simple, everyday language.
 - **Session Storage**: PostgreSQL-based session storage with connect-pg-simple
 
 ### Database Design
-- **Database**: PostgreSQL (configured for Neon serverless)
+- **Database**: PostgreSQL (Neon serverless with connection pooling)
 - **Schema**: 
-  - `tarot_cards`: Stores card information (name, arcana, meaning, symbolism, guidance)
+  - `tarot_cards`: Stores card information (name, arcana, meaning, symbolism, guidance, keywords, images)
   - `card_readings`: Stores scan history with timestamps and image data
   - `users`: Basic user management (currently minimal implementation)
+- **Seeded Data**: Complete Major Arcana deck (22 cards) with detailed descriptions
+- **Storage Interface**: Abstracted IStorage interface supporting both in-memory and database implementations
 
 ## Key Components
 
@@ -41,9 +43,10 @@ Preferred communication style: Simple, everyday language.
 4. **UI Components**: Comprehensive set of reusable components from shadcn/ui
 
 ### Backend Services
-1. **Storage Layer**: Abstracted storage interface with in-memory implementation for development
+1. **Storage Layer**: PostgreSQL database with Drizzle ORM for persistent data storage
 2. **Card Recognition**: Simulated image recognition service (placeholder for real AI integration)
 3. **API Routes**: RESTful endpoints for card operations and recognition
+4. **Database**: PostgreSQL with Neon serverless driver for production scalability
 
 ### Shared Resources
 1. **Schema Definitions**: Zod schemas and TypeScript types shared between client and server
