@@ -168,7 +168,7 @@ export default function DailyCard() {
                       <div className="text-left max-w-2xl mx-auto">
                         <h5 className="font-semibold text-teal-600 mb-2">Today's Message:</h5>
                         <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
-                          {currentCard.meaning.split('\n\n')[0]}
+                          {currentCard.meaning}
                         </p>
                       </div>
                     )}
