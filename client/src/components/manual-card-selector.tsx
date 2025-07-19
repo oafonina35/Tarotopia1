@@ -24,24 +24,20 @@ export default function ManualCardSelector({ onCardSelected, onClose }: ManualCa
   });
 
   const createReadingMutation = useMutation({
-    mutationFn: async (cardId: number): Promise<CardReading> => {
+    mutationFn: async (card: TarotCard): Promise<CardReading> => {
       const response = await apiRequest('POST', '/api/readings', { 
-        cardId, 
-        imageData: null,
-        confidence: 1.0,
-        method: 'manual_selection'
+        cardId: card.id,
+        cardName: card.name,
+        imageData: null
       });
       return response.json();
     },
-    onSuccess: (reading, cardId) => {
-      const selectedCard = cards.find(c => c.id === cardId);
-      if (selectedCard) {
-        onCardSelected(selectedCard, reading);
-        toast({
-          title: "Card Selected!",
-          description: `You chose "${selectedCard.name}" - view the full reading below.`,
-        });
-      }
+    onSuccess: (reading, card) => {
+      onCardSelected(card, reading);
+      toast({
+        title: "Card Selected!",
+        description: `You chose "${card.name}" - view the full reading below.`,
+      });
     },
     onError: (error) => {
       toast({
@@ -59,7 +55,7 @@ export default function ManualCardSelector({ onCardSelected, onClose }: ManualCa
   );
 
   const handleCardSelect = (card: TarotCard) => {
-    createReadingMutation.mutate(card.id);
+    createReadingMutation.mutate(card);
   };
 
   return (
