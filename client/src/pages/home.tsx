@@ -16,10 +16,29 @@ export default function Home() {
   const [currentReading, setCurrentReading] = useState<CardReading | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [showManualSelector, setShowManualSelector] = useState<boolean>(false);
+  const [lastScannedImage, setLastScannedImage] = useState<string>('');
+  const [scanResult, setScanResult] = useState<{
+    confidence: number;
+    isLearned: boolean;
+    method: string;
+  } | null>(null);
 
-  const handleScanComplete = (card: TarotCard, reading: CardReading) => {
+  const handleScanComplete = (card: TarotCard, reading: CardReading, scanData?: {
+    imageData: string;
+    confidence: number;
+    isLearned: boolean;
+    method: string;
+  }) => {
     setRecognizedCard(card);
     setCurrentReading(reading);
+    if (scanData) {
+      setLastScannedImage(scanData.imageData);
+      setScanResult({
+        confidence: scanData.confidence,
+        isLearned: scanData.isLearned,
+        method: scanData.method
+      });
+    }
     setScanningState('result');
   };
 
@@ -33,6 +52,8 @@ export default function Home() {
     setCurrentReading(null);
     setErrorMessage('');
     setShowManualSelector(false);
+    setLastScannedImage('');
+    setScanResult(null);
     setScanningState('ready');
   };
 
@@ -131,15 +152,17 @@ export default function Home() {
               />
               
               {/* Training Interface */}
-              <div className="mt-6">
-                <TrainingInterface
-                  scannedImage=""
-                  currentCard={recognizedCard}
-                  confidence={0.75}
-                  isLearned={false}
-                  method="pattern-based"
-                />
-              </div>
+              {scanResult && (
+                <div className="mt-6">
+                  <TrainingInterface
+                    scannedImage={lastScannedImage}
+                    currentCard={recognizedCard}
+                    confidence={scanResult.confidence}
+                    isLearned={scanResult.isLearned}
+                    method={scanResult.method}
+                  />
+                </div>
+              )}
             </>
           )}
 

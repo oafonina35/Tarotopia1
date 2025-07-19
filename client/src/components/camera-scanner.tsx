@@ -11,7 +11,12 @@ type ScanningState = 'ready' | 'scanning' | 'processing' | 'result' | 'error';
 interface CameraScannerProps {
   scanningState: ScanningState;
   setScanningState: (state: ScanningState) => void;
-  onScanComplete: (card: TarotCard, reading: CardReading) => void;
+  onScanComplete: (card: TarotCard, reading: CardReading, scanData?: {
+    imageData: string;
+    confidence: number;
+    isLearned: boolean;
+    method: string;
+  }) => void;
   onScanError: (error: string) => void;
 }
 
@@ -19,6 +24,8 @@ interface RecognitionResponse {
   card: TarotCard;
   reading: CardReading;
   confidence: number;
+  isLearned: boolean;
+  method: string;
 }
 
 export default function CameraScanner({ 
@@ -34,13 +41,19 @@ export default function CameraScanner({
   const { toast } = useToast();
 
   const recognizeCardMutation = useMutation({
-    mutationFn: async (imageData: string): Promise<RecognitionResponse> => {
+    mutationFn: async (imageData: string): Promise<{response: RecognitionResponse, imageData: string}> => {
       const response = await apiRequest('POST', '/api/recognize-card', { imageData });
-      return response.json();
+      const data = await response.json();
+      return { response: data, imageData };
     },
-    onSuccess: (data) => {
+    onSuccess: ({ response: data, imageData }) => {
       setScanningState('result');
-      onScanComplete(data.card, data.reading);
+      onScanComplete(data.card, data.reading, {
+        imageData,
+        confidence: data.confidence,
+        isLearned: data.isLearned,
+        method: data.method
+      });
       toast({
         title: "Card Recognized!",
         description: `Identified as "${data.card.name}" with ${Math.round(data.confidence * 100)}% confidence.`,
