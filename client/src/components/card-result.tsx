@@ -75,7 +75,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
 
 
         <div>
-          <h4 className="text-lg font-serif font-semibold text-mystic-gold mb-2">Guidance</h4>
+          <h4 className="text-lg font-serif font-semibold text-mystic-gold mb-2">Sensual Suggestions</h4>
           <p className="text-gray-300 text-sm leading-relaxed">
             {card.guidance}
           </p>
