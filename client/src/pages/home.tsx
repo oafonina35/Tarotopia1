@@ -8,6 +8,7 @@ import RecognitionOptions from "@/components/recognition-options";
 import { Button } from "@/components/ui/button";
 import { Star, Menu, BookOpen } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
+import tarotopiaLogo from "@assets/Tarotopia-01_1752963540547.png";
 
 type ScanningState = 'ready' | 'scanning' | 'processing' | 'result' | 'error';
 
@@ -78,7 +79,7 @@ export default function Home() {
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <img 
-              src="@assets/tarotopia-logo.png" 
+              src={tarotopiaLogo} 
               alt="Tarotopia Logo" 
               className="w-12 h-12 object-contain"
             />
