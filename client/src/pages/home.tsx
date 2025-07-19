@@ -77,10 +77,12 @@ export default function Home() {
       <header className="relative z-10 px-4 py-6">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <Star className="w-5 h-5 text-primary-foreground" fill="currentColor" />
-            </div>
-            <h1 className="text-xl font-serif font-semibold text-primary">Mystic Scanner</h1>
+            <img 
+              src="@assets/tarotopia-logo.png" 
+              alt="Tarotopia Logo" 
+              className="w-12 h-12 object-contain"
+            />
+            <h1 className="text-xl font-serif font-semibold text-primary">Tarotopia</h1>
           </div>
           <Button variant="ghost" size="icon" className="text-foreground hover:bg-accent/50">
             <Menu className="w-6 h-6" />
