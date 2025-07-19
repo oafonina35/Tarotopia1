@@ -8,6 +8,7 @@ import { trainImageForCard, findTrainedCard } from "./image-training";
 import { enhancedCardRecognition } from "./simple-card-recognition";
 import { recognizeWithTraining, trainCard } from "./manual-training-recognition";
 import { getTrainingStats } from "./manual-training-recognition";
+import { recognizeCardByText } from "./text-recognition";
 import { z } from "zod";
 
 const cardRecognitionSchema = z.object({
@@ -63,9 +64,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Use training-based recognition
-      const recognitionResult = await recognizeWithTraining(imageData, allCards);
-      const recognizedCard = recognitionResult.card;
+      // Try text recognition first
+      const textResult = await recognizeCardByText(imageData, allCards);
+      
+      let recognitionResult;
+      let recognizedCard;
+      
+      if (textResult.card && textResult.confidence > 0.7) {
+        // High confidence text recognition
+        recognitionResult = {
+          card: textResult.card,
+          confidence: textResult.confidence,
+          isLearned: false,
+          method: 'text-recognition'
+        };
+        recognizedCard = textResult.card;
+      } else {
+        // Fall back to training-based recognition
+        recognitionResult = await recognizeWithTraining(imageData, allCards);
+        recognizedCard = recognitionResult.card;
+      }
       
       if (!recognizedCard) {
         return res.status(500).json({ error: "Failed to process image" });
@@ -84,9 +102,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         card: recognizedCard,
         reading: reading,
-        confidence: confidence,
-        isLearned: recognitionResult.isLearned,
-        method: recognitionResult.isLearned ? 'learned' : 'pattern-based'
+        confidence: recognitionResult.confidence,
+        isLearned: recognitionResult.isLearned || false,
+        method: recognitionResult.method || (recognitionResult.isLearned ? 'learned' : 'pattern-based')
       });
     } catch (error) {
       console.error("Error recognizing card:", error);
@@ -202,10 +220,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test text recognition (debug endpoint)
+  app.post("/api/debug-text-recognition", async (req, res) => {
+    try {
+      const { imageData } = req.body;
+      
+      if (!imageData) {
+        return res.status(400).json({ error: "Image data required" });
+      }
+
+      const allCards = await storage.getAllTarotCards();
+      const result = await recognizeCardByText(imageData, allCards);
+      
+      res.json({
+        extractedText: result.extractedText,
+        matchedCard: result.card?.name || 'No match found',
+        confidence: result.confidence,
+        method: result.method
+      });
+    } catch (error) {
+      console.error("Error in text recognition debug:", error);
+      res.status(500).json({ error: "Failed to process text recognition" });
+    }
+  });
+
   // Get all cards for manual selection
   app.get("/api/cards", async (req, res) => {
     try {
-      const cards = await storage.getAllCards();
+      const cards = await storage.getAllTarotCards();
       res.json(cards);
     } catch (error) {
       console.error("Error fetching cards:", error);
