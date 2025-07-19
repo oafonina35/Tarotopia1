@@ -96,7 +96,7 @@ export async function recognizeWithFreeOCR(imageData: string, allCards: TarotCar
   }
 }
 
-// Helper function to find best card match from extracted text
+// Helper function to find best card match from extracted text - Enhanced version
 function findBestCardMatch(extractedText: string, allCards: TarotCard[]): { card: TarotCard; confidence: number } | null {
   const cleanText = extractedText.toLowerCase().trim();
   

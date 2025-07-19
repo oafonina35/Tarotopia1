@@ -1,99 +1,10 @@
 import type { TarotCard } from "@shared/schema";
 
-export interface UnlimitedOCRResult {
-  card: TarotCard | null;
-  confidence: number;
-  extractedText: string;
-  method: 'tesseract' | 'browser-ocr' | 'offline-ocr';
-}
-
-// Tesseract.js - Unlimited, runs locally in Node.js
-export async function recognizeWithTesseract(imageData: string, allCards: TarotCard[]): Promise<UnlimitedOCRResult> {
-  try {
-    console.log('🔍 Using Tesseract.js for unlimited OCR...');
-    
-    // Dynamic import of tesseract.js
-    const { createWorker } = await import('tesseract.js');
-    
-    // Convert base64 to buffer
-    const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
-    const imageBuffer = Buffer.from(base64Data, 'base64');
-    
-    // Initialize Tesseract worker with optimized settings
-    const worker = await createWorker('eng');
-    
-    // Configure for better card text recognition
-    await worker.setParameters({
-      tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .',
-      tessedit_pageseg_mode: '8', // Single word
-      tessedit_ocr_engine_mode: '1' // Neural nets LSTM only
-    });
-    
-    // Perform OCR
-    const { data: { text } } = await worker.recognize(imageBuffer);
-    
-    await worker.terminate();
-    
-    console.log('🎯 Tesseract extracted text:', text);
-    
-    if (text.trim()) {
-      const matchedCard = findBestCardMatch(text, allCards);
-      
-      if (matchedCard) {
-        console.log(`✅ Tesseract matched: ${matchedCard.card.name} (confidence: ${matchedCard.confidence})`);
-        return {
-          card: matchedCard.card,
-          confidence: matchedCard.confidence,
-          extractedText: text,
-          method: 'tesseract'
-        };
-      }
-    }
-    
-    return {
-      card: null,
-      confidence: 0,
-      extractedText: text || 'No text found',
-      method: 'tesseract'
-    };
-  } catch (error) {
-    console.error('Tesseract OCR error:', error);
-    return {
-      card: null,
-      confidence: 0,
-      extractedText: 'Tesseract Error',
-      method: 'tesseract'
-    };
-  }
-}
-
-// Browser-based OCR using Web APIs (completely client-side)
-export async function getBrowserOCRInstructions(): Promise<string> {
-  return `
-    Browser OCR Options (Unlimited & Offline):
-    
-    1. Tesseract.js in Browser:
-       - Runs completely in browser
-       - No server calls, unlimited use
-       - 2-4MB download, then offline forever
-    
-    2. Web Text Detection API:
-       - Native browser text recognition
-       - Works offline after initial load
-       - Supported in Chrome/Edge
-    
-    3. Client-side Implementation:
-       - Move OCR to frontend
-       - No API limits or costs
-       - Works without internet after load
-  `;
-}
-
-// Helper function to find best card match from extracted text
-function findBestCardMatch(extractedText: string, allCards: TarotCard[]): { card: TarotCard; confidence: number } | null {
+// Enhanced card matching with multiple algorithms for maximum accuracy
+export function findBestCardMatch(extractedText: string, allCards: TarotCard[]): { card: TarotCard; confidence: number } | null {
   const cleanText = extractedText.toLowerCase().trim();
   
-  // Enhanced pattern matching for numbered format (like "9. THE HERMIT")
+  // Algorithm 1: Enhanced numbered format matching (like "9. THE HERMIT")
   const numberedPattern = cleanText.match(/(\d+)\.\s*(?:the\s+)?([a-z\s]+)/i);
   if (numberedPattern) {
     const cardNumber = parseInt(numberedPattern[1]);
@@ -116,10 +27,10 @@ function findBestCardMatch(extractedText: string, allCards: TarotCard[]): { card
     }
   }
   
-  // Roman numeral patterns (XXI. THE WORLD, etc.)
+  // Algorithm 2: Roman numeral patterns (XXI. THE WORLD, etc.)
   const romanPattern = cleanText.match(/(xxi|xx|xix|xviii|xvii|xvi|xv|xiv|xiii|xii|xi|x|ix|viii|vii|vi|v|iv|iii|ii|i)\.\s*(?:the\s+)?([a-z\s]+)/i);
   if (romanPattern) {
-    const romanToNumber = {
+    const romanToNumber: Record<string, number> = {
       'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7, 'viii': 8, 'ix': 9, 'x': 10,
       'xi': 11, 'xii': 12, 'xiii': 13, 'xiv': 14, 'xv': 15, 'xvi': 16, 'xvii': 17, 'xviii': 18, 'xix': 19, 'xx': 20, 'xxi': 21
     };
@@ -134,7 +45,7 @@ function findBestCardMatch(extractedText: string, allCards: TarotCard[]): { card
     }
   }
   
-  // Direct name matches (high confidence)
+  // Algorithm 3: Direct name matches (high confidence)
   for (const card of allCards) {
     const cardName = card.name.toLowerCase();
     if (cleanText.includes(cardName)) {
@@ -142,7 +53,7 @@ function findBestCardMatch(extractedText: string, allCards: TarotCard[]): { card
     }
   }
   
-  // Enhanced number + suit matches for minor arcana
+  // Algorithm 4: Enhanced number + suit matches for minor arcana
   const numberMatch = cleanText.match(/(\d+|ace|king|queen|knight|jack|page)/i);
   const suitMatch = cleanText.match(/(wands?|cups?|swords?|pentacles?|coins?|disks?)/i);
   
@@ -161,7 +72,7 @@ function findBestCardMatch(extractedText: string, allCards: TarotCard[]): { card
     }
   }
   
-  // Enhanced partial word matches with better scoring
+  // Algorithm 5: Enhanced partial word matches with fuzzy matching
   const textWords = cleanText.split(/\s+/).filter(word => word.length > 2);
   let bestMatch: { card: TarotCard; confidence: number } | null = null;
   
@@ -208,7 +119,7 @@ function calculateStringSimilarity(str1: string, str2: string): number {
   return (longer.length - editDistance) / longer.length;
 }
 
-// Calculate Levenshtein distance
+// Calculate Levenshtein distance for fuzzy string matching
 function levenshteinDistance(str1: string, str2: string): number {
   const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
   
@@ -227,39 +138,4 @@ function levenshteinDistance(str1: string, str2: string): number {
   }
   
   return matrix[str2.length][str1.length];
-}
-
-// Self-hosted OCR options
-export function getSelfHostedOCROptions(): string {
-  return `
-    Self-Hosted Unlimited OCR Solutions:
-    
-    1. Tesseract.js (Node.js/Browser):
-       ✅ Already implemented above
-       ✅ Unlimited use, no API calls
-       ✅ Works offline
-    
-    2. PaddleOCR (Python):
-       - Ultra-accurate Chinese OCR engine
-       - Supports 80+ languages
-       - GPU acceleration available
-       - Install: pip install paddlepaddle paddleocr
-    
-    3. EasyOCR (Python):
-       - 80+ languages supported
-       - Good accuracy, easy setup
-       - Install: pip install easyocr
-    
-    4. TrOCR (Transformers):
-       - Microsoft's transformer-based OCR
-       - State-of-the-art accuracy
-       - Runs locally with Hugging Face
-    
-    5. Surya OCR (2024):
-       - Modern, accurate OCR
-       - Layout detection included
-       - Self-hosted, no limits
-    
-    All options run on your own hardware with zero API costs.
-  `;
 }
