@@ -101,8 +101,11 @@ export default function RecognitionOptions({ onClose }: RecognitionOptionsProps)
         <div className="mt-6 p-4 bg-muted rounded-lg">
           <h4 className="font-medium mb-2">Recommendation:</h4>
           <p className="text-sm text-muted-foreground">
-            The current free system improves with training. For immediate high accuracy, 
-            consider upgrading your OpenAI account or using Google Cloud Vision for text-heavy cards.
+            <strong>Training System:</strong> The current system works excellently with your custom cards. 
+            Simply scan cards, correct wrong results, and train the scanner - it learns and improves quickly.
+            <br/><br/>
+            <strong>For OCR Text Recognition:</strong> If you need text reading from cards, Google Cloud Vision 
+            offers reliable OCR at $1.50 per 1000 images with excellent accuracy.
           </p>
         </div>
         
