@@ -112,8 +112,8 @@ export default function Home() {
             </div>
           )}
 
-          {/* Browse Deck Button */}
-          {scanningState === 'ready' && !showManualSelector && (
+          {/* Browse Deck Button - Always Visible */}
+          {!showManualSelector && (
             <div className="text-center mb-6">
               <Button
                 onClick={() => setShowManualSelector(true)}
