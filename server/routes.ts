@@ -6,7 +6,8 @@ import { recognizeCardByText } from "./card-recognition";
 import { recognizeCardBySimpleMatch } from "./simple-text-recognition";
 import { trainImageForCard, findTrainedCard } from "./image-training";
 import { enhancedCardRecognition } from "./simple-card-recognition";
-import { recognizeWithTraining, trainCard, getTrainingStats } from "./manual-training-recognition";
+import { recognizeWithTraining, trainCard } from "./manual-training-recognition";
+import { getTrainingStats } from "./manual-training-recognition";
 import { z } from "zod";
 
 const cardRecognitionSchema = z.object({
@@ -167,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get the card details
-      const allCards = await storage.getAllCards();
+      const allCards = await storage.getAllTarotCards();
       const targetCard = allCards.find(c => c.id === cardId);
       
       if (!targetCard) {
@@ -177,8 +178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Train the new system
       trainCard(imageData, targetCard);
       
-      // Also train the old system for backward compatibility
-      trainImageForCard(imageData, cardId);
+      // Note: Using only the new training system now
       
       res.json({ 
         success: true, 
