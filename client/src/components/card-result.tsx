@@ -22,7 +22,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
           <span className="text-sm font-medium">Card Identified</span>
         </div>
         <h3 className="text-2xl font-serif font-bold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>{card.name}</h3>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm" style={{ color: 'hsl(180, 45%, 35%)' }}>
           {card.arcana} Arcana • Card {card.number !== null ? card.number : 'N/A'}
         </p>
       </div>
@@ -58,7 +58,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
             </div>
           </div>
         )}
-        <p className="text-center text-primary text-sm font-medium italic">
+        <p className="text-center text-sm font-medium italic" style={{ color: 'hsl(180, 45%, 35%)' }}>
           {card.symbolism}
         </p>
       </div>
