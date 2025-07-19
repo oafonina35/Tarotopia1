@@ -135,7 +135,7 @@ export default function ManualCardSelector({ onCardSelected, onClose }: ManualCa
                       </div>
                     </div>
                     {card.imageUrl && (
-                      <div className="w-12 h-16 rounded border overflow-hidden ml-4 flex-shrink-0">
+                      <div className="w-20 h-28 rounded border overflow-hidden ml-4 flex-shrink-0">
                         <img
                           src={card.imageUrl.replace('@assets/', '/attached_assets/')}
                           alt={card.name}
