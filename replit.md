@@ -63,7 +63,8 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
 - **July 19, 2025**: Complete deck transformation and organization
   - Replaced all 78 tarot cards with enhanced sensual/erotic themed artwork
   - Updated entire Major Arcana (22 cards) and all four Minor Arcana suits
-  - Fixed card image mismatches: 9 of Cups, Page of Cups, 10 of Cups, Knight of Cups, Queen of Cups
+  - Fixed card image mismatches: 9 of Cups, Page of Cups, 10 of Cups, Knight of Cups, Queen of Cups, The High Priestess
+  - Updated all Cup court cards with proper sensual artwork
   - Implemented proper card sorting in manual selector: Major Arcana first, then suits (Wands, Cups, Swords, Pentacles) by number
   - Added card preview thumbnails in manual selector with proper image path conversion
   - Fixed training system with database persistence (95% accuracy)
