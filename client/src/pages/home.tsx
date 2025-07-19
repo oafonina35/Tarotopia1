@@ -83,7 +83,7 @@ export default function Home() {
               alt="Tarotopia Logo" 
               className="w-12 h-12 object-contain"
             />
-            <h1 className="text-xl font-serif font-semibold text-primary">Tarotopia</h1>
+            <h1 className="text-xl font-serif font-semibold text-black">Tarotopia</h1>
           </div>
           <Button variant="ghost" size="icon" className="text-foreground hover:bg-accent/50">
             <Menu className="w-6 h-6" />
