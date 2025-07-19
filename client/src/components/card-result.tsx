@@ -28,9 +28,9 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
       </div>
 
       {/* Card Image */}
-      <div className="mb-6 flex justify-center">
+      <div className="mb-6 flex flex-col items-center">
         {card.imageUrl ? (
-          <div className="relative w-32 h-48 rounded-lg shadow-lg border border-mystic-gold/30 overflow-hidden">
+          <div className="relative w-32 h-48 rounded-lg shadow-lg border border-mystic-gold/30 overflow-hidden mb-3">
             <img 
               src={card.imageUrl.replace('@assets/', '/attached_assets/')}
               alt={card.name}
@@ -51,13 +51,16 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
             />
           </div>
         ) : (
-          <div className="w-32 h-48 bg-gradient-to-br from-mystic-purple to-cosmic-blue rounded-lg shadow-lg border border-mystic-gold/30 flex items-center justify-center">
+          <div className="w-32 h-48 bg-gradient-to-br from-mystic-purple to-cosmic-blue rounded-lg shadow-lg border border-mystic-gold/30 flex items-center justify-center mb-3">
             <div className="text-center">
               <Star className="w-8 h-8 text-mystic-gold mx-auto mb-2" fill="currentColor" />
               <p className="text-mystic-gold text-xs font-medium">{card.name}</p>
             </div>
           </div>
         )}
+        <p className="text-center text-mystic-gold text-sm font-medium italic">
+          {card.symbolism}
+        </p>
       </div>
 
       {/* Card Description */}
@@ -69,12 +72,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
           </p>
         </div>
         
-        <div>
-          <h4 className="text-lg font-serif font-semibold text-mystic-gold mb-2">Symbolism</h4>
-          <p className="text-gray-300 text-sm leading-relaxed">
-            {card.symbolism}
-          </p>
-        </div>
+
 
         <div>
           <h4 className="text-lg font-serif font-semibold text-mystic-gold mb-2">Guidance</h4>
