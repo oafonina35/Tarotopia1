@@ -83,21 +83,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
           </p>
         </div>
 
-        {card.keywords && card.keywords.length > 0 && (
-          <div>
-            <h4 className="text-lg font-serif font-semibold text-mystic-gold mb-2">Keywords</h4>
-            <div className="flex flex-wrap gap-2">
-              {card.keywords.map((keyword, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 bg-mystic-purple/30 text-mystic-gold text-xs rounded-md border border-mystic-gold/20"
-                >
-                  {keyword}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+
       </div>
 
       {/* Action Buttons */}
