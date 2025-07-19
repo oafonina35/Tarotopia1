@@ -72,17 +72,17 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen cosmic-gradient">
+    <div className="min-h-screen ethereal-gradient">
       {/* Header */}
       <header className="relative z-10 px-4 py-6">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-mystic-gold rounded-full flex items-center justify-center">
-              <Star className="w-5 h-5 text-rich-black" fill="currentColor" />
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+              <Star className="w-5 h-5 text-primary-foreground" fill="currentColor" />
             </div>
-            <h1 className="text-xl font-serif font-semibold text-mystic-gold">Mystic Scanner</h1>
+            <h1 className="text-xl font-serif font-semibold text-primary">Mystic Scanner</h1>
           </div>
-          <Button variant="ghost" size="icon" className="text-gray-100 hover:bg-charcoal/50">
+          <Button variant="ghost" size="icon" className="text-foreground hover:bg-accent/50">
             <Menu className="w-6 h-6" />
           </Button>
         </div>
@@ -103,10 +103,10 @@ export default function Home() {
                   backgroundPosition: 'center'
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-rich-black via-mystic-purple/50 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-soft-mauve via-cosmic-turquoise/50 to-transparent"></div>
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-                  <h2 className="text-2xl font-serif font-bold text-mystic-gold mb-2">Discover Your Path</h2>
-                  <p className="text-sm text-gray-300 max-w-64">Scan any tarot card to reveal its mystical meanings and guidance</p>
+                  <h2 className="text-2xl font-serif font-bold text-primary mb-2">Discover Your Path</h2>
+                  <p className="text-sm text-foreground/80 max-w-64">Scan any tarot card to reveal its mystical meanings and guidance</p>
                 </div>
               </div>
             </div>
@@ -118,7 +118,7 @@ export default function Home() {
               <Button
                 onClick={() => setShowManualSelector(true)}
                 variant="outline"
-                className="border-mystic-gold/30 text-mystic-gold hover:bg-mystic-gold/10"
+                className="border-primary/30 text-primary hover:bg-primary/10"
               >
                 <BookOpen className="w-4 h-4 mr-2" />
                 Choose Card Manually
