@@ -60,15 +60,16 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
 3. **Reading History**: Previous scans stored in database → Retrieved and displayed in recent readings component
 
 ## Recent Changes
-- **July 19, 2025**: Complete recognition system overhaul
+- **July 19, 2025**: Complete deck transformation and organization
+  - Replaced all 78 tarot cards with enhanced sensual/erotic themed artwork
+  - Updated entire Major Arcana (22 cards) and all four Minor Arcana suits
+  - Verified database integrity - all card images properly matched to descriptions  
+  - Implemented proper card sorting in manual selector: Major Arcana first, then suits (Wands, Cups, Swords, Pentacles) by number
   - Fixed training system with database persistence (95% accuracy)
   - Added free OCR.space API integration (500 requests/day, no cost)
   - Implemented 4-layer recognition: Training → Free OCR → OpenAI Vision → Pattern Matching
   - Enhanced fuzzy matching with multi-segment hash comparison
   - User confirmed preference for flat-fee options over pay-per-use
-  - OpenAI Vision available but user has quota limits on current plan
-  - Free OCR provides unlimited text recognition without any subscription costs
-  - Fixed major card image mismatches (Aces, Wands suit 5-10, 9 of Cups)
   - Added permanent manual card selection button for easy deck browsing
 
 ## External Dependencies
