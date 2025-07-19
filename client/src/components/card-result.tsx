@@ -21,7 +21,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
           <Star className="w-5 h-5" fill="currentColor" />
           <span className="text-sm font-medium">Card Identified</span>
         </div>
-        <h3 className="text-2xl font-serif font-bold text-primary mb-2">{card.name}</h3>
+        <h3 className="text-2xl font-serif font-bold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>{card.name}</h3>
         <p className="text-muted-foreground text-sm">
           {card.arcana} Arcana • Card {card.number !== null ? card.number : 'N/A'}
         </p>
@@ -66,7 +66,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
       {/* Card Description */}
       <div className="space-y-4">
         <div>
-          <h4 className="text-lg font-serif font-semibold text-primary mb-2">Meaning</h4>
+          <h4 className="text-lg font-serif font-semibold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>Meaning</h4>
           <p className="text-foreground/90 text-sm leading-relaxed">
             {card.meaning}
           </p>
@@ -76,7 +76,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
 
         {card.arcana === 'Major' && (
           <div>
-            <h4 className="text-lg font-serif font-semibold text-primary mb-2">Sensual Suggestions</h4>
+            <h4 className="text-lg font-serif font-semibold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>Sensual Suggestions</h4>
             <div className="text-foreground/90 text-sm leading-relaxed">
               {card.guidance && card.guidance.split('\n').map((suggestion, index) => (
                 <div key={index} className="flex items-start mb-2">
