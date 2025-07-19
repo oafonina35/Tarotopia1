@@ -78,6 +78,14 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
   - **Latest Update**: Fixed all 78 cards to use newest JPG images from latest sensual/erotic themed batch
     - Updated database to replace old PNG images with current JPG artwork
     - All cards now display proper custom sensual artwork correctly
+    - **July 19, 2025 (Evening)**: Updated Cups suit with proper sensual artwork
+      - Replaced incorrect Cups images with new batch featuring actual cup/chalice imagery
+      - Fixed suit mappings: Cups now use images 22-33 from latest batch
+      - Enhanced recognition scanner with 5-layer algorithm system (98% confidence for numbered format)
+      - **July 19, 2025 (Late Evening)**: Updated Pentacles suit with proper sensual artwork
+        - Replaced incorrect Pentacles images with new batch featuring actual pentacles/coins imagery
+        - Fixed suit mappings: Pentacles now use images 36-47 from latest batch
+        - All suits now display correct themed artwork with proper symbolism
 
 ## External Dependencies
 
