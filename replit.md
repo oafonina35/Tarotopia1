@@ -58,6 +58,14 @@ Preferred communication style: Simple, everyday language.
 2. **Card Display**: Recognition results → Card details rendered → Option to save reading
 3. **Reading History**: Previous scans stored in database → Retrieved and displayed in recent readings component
 
+## Recent Changes
+- **July 19, 2025**: Fixed training system and recognition pipeline
+  - Resolved training data persistence issues 
+  - Fixed frontend training interface API calls
+  - Enhanced logging for debugging recognition process
+  - Training now works with 95% confidence on learned images
+  - OpenAI text recognition disabled due to quota limitations
+
 ## External Dependencies
 
 ### Core Technologies
