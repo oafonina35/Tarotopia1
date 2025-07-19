@@ -48,11 +48,43 @@ export default function ManualCardSelector({ onCardSelected, onClose }: ManualCa
     },
   });
 
-  const filteredCards = cards.filter(card =>
-    card.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    card.arcana.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (card.suit && card.suit.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const getSortOrder = (card: TarotCard): number => {
+    // Major Arcana first (0-21)
+    if (card.arcana === 'Major') {
+      return card.number ?? 0;
+    }
+    
+    // Minor Arcana - offset by 100 + suit order + card number
+    const suitOrder = {
+      'Wands': 100,
+      'Cups': 200,
+      'Swords': 300,
+      'Pentacles': 400
+    };
+    
+    const suitOffset = suitOrder[card.suit as keyof typeof suitOrder] ?? 500;
+    
+    // Handle court cards (Page=11, Knight=12, Queen=13, King=14)
+    if (card.name.includes('Page')) return suitOffset + 11;
+    if (card.name.includes('Knight')) return suitOffset + 12;
+    if (card.name.includes('Queen')) return suitOffset + 13;
+    if (card.name.includes('King')) return suitOffset + 14;
+    if (card.name.includes('Ace')) return suitOffset + 1;
+    
+    // Extract number from card name (e.g., "2 of Wands" -> 2)
+    const match = card.name.match(/^(\d+)\s+of/);
+    const cardNumber = match ? parseInt(match[1]) : 15;
+    
+    return suitOffset + cardNumber;
+  };
+
+  const filteredCards = cards
+    .filter(card =>
+      card.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      card.arcana.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (card.suit && card.suit.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => getSortOrder(a) - getSortOrder(b));
 
   const handleCardSelect = (card: TarotCard) => {
     createReadingMutation.mutate(card);
@@ -105,9 +137,14 @@ export default function ManualCardSelector({ onCardSelected, onClose }: ManualCa
                     {card.imageUrl && (
                       <div className="w-12 h-16 rounded border overflow-hidden ml-4 flex-shrink-0">
                         <img
-                          src={card.imageUrl}
+                          src={card.imageUrl.replace('@assets/', '/attached_assets/')}
                           alt={card.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Hide broken images gracefully
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
                         />
                       </div>
                     )}
