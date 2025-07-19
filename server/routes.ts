@@ -65,26 +65,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Use training-based recognition first (most reliable)
-      const trainingResult = await recognizeWithTraining(imageData, allCards);
+      // Try OpenAI Vision recognition first (most accurate for text)
+      const textResult = await recognizeCardByText(imageData, allCards);
       
       let recognitionResult;
       let recognizedCard;
       
-      if (trainingResult.confidence > 0.8) {
-        // High confidence from training
-        recognitionResult = trainingResult;
-        recognizedCard = trainingResult.card;
-      } else {
-        // Use advanced image recognition as fallback
-        const advancedResult = await advancedImageRecognition(imageData, allCards);
+      if (textResult.card && textResult.confidence > 0.7) {
+        // High confidence text recognition
         recognitionResult = {
-          card: advancedResult.card,
-          confidence: Math.max(advancedResult.confidence, trainingResult.confidence),
-          isLearned: advancedResult.isLearned,
-          method: trainingResult.confidence > advancedResult.confidence ? 'pattern-based' : advancedResult.method
+          card: textResult.card,
+          confidence: textResult.confidence,
+          isLearned: false,
+          method: 'openai-vision'
         };
-        recognizedCard = trainingResult.confidence > advancedResult.confidence ? trainingResult.card : advancedResult.card;
+        recognizedCard = textResult.card;
+        console.log(`✅ OpenAI Vision recognized: ${textResult.card.name} (confidence: ${textResult.confidence})`);
+      } else {
+        // Fall back to training-based recognition
+        const trainingResult = await recognizeWithTraining(imageData, allCards);
+        
+        if (trainingResult.confidence > 0.8) {
+          // High confidence from training
+          recognitionResult = trainingResult;
+          recognizedCard = trainingResult.card;
+        } else {
+          // Use advanced image recognition as final fallback
+          const advancedResult = await advancedImageRecognition(imageData, allCards);
+          recognitionResult = {
+            card: advancedResult.card,
+            confidence: Math.max(advancedResult.confidence, trainingResult.confidence),
+            isLearned: advancedResult.isLearned,
+            method: trainingResult.confidence > advancedResult.confidence ? 'pattern-based' : advancedResult.method
+          };
+          recognizedCard = trainingResult.confidence > advancedResult.confidence ? trainingResult.card : advancedResult.card;
+        }
       }
       
       if (!recognizedCard) {
@@ -219,6 +234,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting training stats:", error);
       res.status(500).json({ error: "Failed to get training stats" });
+    }
+  });
+
+  // Test OpenAI Vision with sample card
+  app.post("/api/test-openai-vision", async (req, res) => {
+    try {
+      // Test with a known card image (The Fool)
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      const foolImagePath = path.join(process.cwd(), 'attached_assets', '0_1752951880791.png');
+      const imageBuffer = fs.readFileSync(foolImagePath);
+      const base64Image = imageBuffer.toString('base64');
+      const imageData = `data:image/png;base64,${base64Image}`;
+      
+      const allCards = await storage.getAllTarotCards();
+      const result = await recognizeCardByText(imageData, allCards);
+      
+      res.json({
+        success: true,
+        result,
+        message: result.card ? `OpenAI Vision identified: ${result.card.name}` : 'Could not identify card'
+      });
+    } catch (error) {
+      console.error("Error testing OpenAI Vision:", error);
+      res.status(500).json({ error: "Failed to test OpenAI Vision", details: error.message });
     }
   });
 
