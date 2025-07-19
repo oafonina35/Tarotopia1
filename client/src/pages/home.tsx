@@ -3,10 +3,11 @@ import CameraScanner from "@/components/camera-scanner";
 import CardResult from "@/components/card-result";
 import RecentReadings from "@/components/recent-readings";
 import ManualCardSelector from "@/components/manual-card-selector";
+import NavigationMenu from "@/components/navigation-menu";
 import { TrainingInterface } from "@/components/training-interface";
 import RecognitionOptions from "@/components/recognition-options";
 import { Button } from "@/components/ui/button";
-import { Star, Menu, BookOpen } from "lucide-react";
+import { Star, BookOpen } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
 import tarotopiaLogo from "@assets/Tarotopia-01_1752963540547.png";
 
@@ -77,6 +78,7 @@ export default function Home() {
       {/* Header */}
       <header className="relative z-10 px-4 py-6">
         <div className="max-w-md mx-auto flex items-center justify-between">
+          <NavigationMenu />
           <div className="flex-1 flex justify-center">
             <img 
               src={tarotopiaLogo} 
@@ -84,9 +86,6 @@ export default function Home() {
               className="w-36 h-36 object-contain"
             />
           </div>
-          <Button variant="ghost" size="icon" className="text-foreground hover:bg-accent/50">
-            <Menu className="w-6 h-6" />
-          </Button>
         </div>
       </header>
 
