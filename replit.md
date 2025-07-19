@@ -75,6 +75,9 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
   - Added permanent manual card selection button for easy deck browsing
   - Restored full card descriptions without truncation (complete 1200+ character descriptions)
   - Fixed paragraph spacing across all pages with proper line break handling and margin spacing
+  - **Latest Update**: Fixed all 78 cards to use newest JPG images from latest sensual/erotic themed batch
+    - Updated database to replace old PNG images with current JPG artwork
+    - All cards now display proper custom sensual artwork correctly
 
 ## External Dependencies
 
