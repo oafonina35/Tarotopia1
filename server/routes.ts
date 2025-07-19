@@ -5,7 +5,7 @@ import { insertCardReadingSchema, insertTarotCardSchema } from "@shared/schema";
 import { recognizeCardByText } from "./card-recognition";
 import { recognizeCardBySimpleMatch } from "./simple-text-recognition";
 import { trainImageForCard, findTrainedCard } from "./image-training";
-import { imageRecognizer } from "./true-image-recognition";
+import { enhancedCardRecognition } from "./simple-card-recognition";
 import { z } from "zod";
 
 const cardRecognitionSchema = z.object({
@@ -61,18 +61,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // First try true computer vision recognition
-      let recognizedCard = await imageRecognizer.recognizeCard(imageData, allCards);
-      
-      // If CV fails, try trained image associations
-      if (!recognizedCard) {
-        recognizedCard = findTrainedCard(imageData, allCards);
-      }
-      
-      // Final fallback to simple matching
-      if (!recognizedCard) {
-        recognizedCard = await recognizeCardBySimpleMatch(imageData, allCards);
-      }
+      // Use enhanced recognition that analyzes image patterns
+      const recognitionResult = await enhancedCardRecognition(imageData, allCards);
+      const recognizedCard = recognitionResult.card;
       
       if (!recognizedCard) {
         return res.status(500).json({ error: "Failed to process image" });
@@ -85,20 +76,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         imageData: imageData,
       });
 
-      // Calculate confidence based on recognition method
-      let confidence = 0.5;
-      
-      // Check which method found the card
-      const cvResult = await imageRecognizer.recognizeCard(imageData, allCards);
-      const trainedResult = findTrainedCard(imageData, allCards);
-      
-      if (cvResult && cvResult.id === recognizedCard.id) {
-        confidence = Math.random() * 0.2 + 0.8; // 80-100% for CV recognition
-      } else if (trainedResult && trainedResult.id === recognizedCard.id) {
-        confidence = Math.random() * 0.15 + 0.75; // 75-90% for trained recognition
-      } else {
-        confidence = Math.random() * 0.3 + 0.5; // 50-80% for fallback
-      }
+      // Use confidence from enhanced recognition
+      const confidence = recognitionResult.confidence;
 
       res.json({
         card: recognizedCard,
