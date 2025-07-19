@@ -128,9 +128,13 @@ export default function CardMeanings() {
                           {card.meaning && (
                             <div>
                               <h4 className="font-medium text-teal-600 mb-1">Meaning:</h4>
-                              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
-                                {card.meaning}
-                              </p>
+                              <div className="text-sm text-slate-600 leading-relaxed">
+                                {card.meaning.split('\n\n').map((paragraph, index) => (
+                                  <p key={index} className="mb-3 last:mb-0">
+                                    {paragraph.trim()}
+                                  </p>
+                                ))}
+                              </div>
                             </div>
                           )}
                           
