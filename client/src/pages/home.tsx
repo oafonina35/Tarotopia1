@@ -121,7 +121,7 @@ export default function Home() {
                 className="border-mystic-gold/30 text-mystic-gold hover:bg-mystic-gold/10"
               >
                 <BookOpen className="w-4 h-4 mr-2" />
-                Browse Your Custom Deck
+                Choose Card Manually
               </Button>
             </div>
           )}
