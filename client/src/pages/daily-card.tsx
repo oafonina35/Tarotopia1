@@ -3,10 +3,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import NavigationMenu from "@/components/navigation-menu";
 import { Star, Shuffle, Calendar } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { TarotCard, CardReading } from "@shared/schema";
+import tarotopiaLogo from "@assets/Tarotopia-01_1752963540547.png";
 
 export default function DailyCard() {
   const [currentCard, setCurrentCard] = useState<TarotCard | null>(null);
@@ -66,8 +68,23 @@ export default function DailyCard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-rose-50 to-teal-50 p-4">
-      <div className="max-w-3xl mx-auto pt-16">
+    <div className="min-h-screen ethereal-gradient">
+      {/* Header */}
+      <header className="relative z-10 px-4 py-6">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <NavigationMenu />
+          <div className="flex-1 flex justify-center">
+            <img 
+              src={tarotopiaLogo} 
+              alt="Tarotopia Logo" 
+              className="w-36 h-36 object-contain"
+            />
+          </div>
+        </div>
+      </header>
+      
+      <main className="relative z-10 px-4 pb-8">
+        <div className="max-w-3xl mx-auto">
         <Card className="mb-6">
           <CardHeader className="text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -186,7 +203,8 @@ export default function DailyCard() {
             )}
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
