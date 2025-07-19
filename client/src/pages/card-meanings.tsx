@@ -117,14 +117,7 @@ export default function CardMeanings() {
                             </div>
                           )}
                           
-                          {card.symbolism && (
-                            <div>
-                              <h4 className="font-medium text-teal-600 mb-1">Symbolism:</h4>
-                              <p className="text-sm text-slate-600 leading-relaxed">
-                                {card.symbolism}
-                              </p>
-                            </div>
-                          )}
+
                           
                           {card.keywords && (
                             <div>
