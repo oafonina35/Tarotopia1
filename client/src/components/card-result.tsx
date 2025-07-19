@@ -17,7 +17,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
   return (
     <div className="card-gradient rounded-2xl p-6 border border-accent/30 backdrop-blur-sm mb-6">
       <div className="text-center mb-6">
-        <div className="inline-flex items-center space-x-2 text-primary mb-3">
+        <div className="inline-flex items-center space-x-2 mb-3" style={{ color: 'hsl(180, 45%, 35%)' }}>
           <Star className="w-5 h-5" fill="currentColor" />
           <span className="text-sm font-medium">Card Identified</span>
         </div>
