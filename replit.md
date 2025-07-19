@@ -86,6 +86,10 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
         - Replaced incorrect Pentacles images with new batch featuring actual pentacles/coins imagery
         - Fixed suit mappings: Pentacles now use images 36-47 from latest batch
         - All suits now display correct themed artwork with proper symbolism
+        - **July 19, 2025 (Final Update)**: Updated Wands suit with proper sensual artwork
+          - Replaced all Wands images with new batch featuring actual wands/staffs imagery
+          - Fixed suit mappings: Wands now use images 64-77 from latest batch
+          - Complete deck transformation: All 78 cards display correct themed artwork
 
 ## External Dependencies
 
