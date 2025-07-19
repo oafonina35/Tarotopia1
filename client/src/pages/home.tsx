@@ -125,7 +125,7 @@ export default function Home() {
           )}
 
           {/* Scanning Interface */}
-          {!showManualSelector && (
+          {!showManualSelector && scanningState !== 'result' && (
             <CameraScanner
               scanningState={scanningState}
               setScanningState={setScanningState}
