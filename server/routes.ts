@@ -2,14 +2,10 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertCardReadingSchema, insertTarotCardSchema } from "@shared/schema";
-import { recognizeCardByText } from "./card-recognition";
-import { recognizeCardBySimpleMatch } from "./simple-text-recognition";
-import { trainImageForCard, findTrainedCard } from "./image-training";
-import { enhancedCardRecognition } from "./simple-card-recognition";
-import { recognizeWithTraining, trainCard } from "./manual-training-recognition";
-import { getTrainingStats } from "./manual-training-recognition";
 import { recognizeCardByText } from "./text-recognition";
+import { recognizeWithTraining, trainCard, getTrainingStats } from "./manual-training-recognition";
 import { advancedImageRecognition, RECOGNITION_OPTIONS } from "./advanced-recognition";
+import { recognizeWithFreeOCR } from "./free-ocr-recognition";
 import { z } from "zod";
 
 const cardRecognitionSchema = z.object({
@@ -65,40 +61,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Try OpenAI Vision recognition first (most accurate for text)
-      const textResult = await recognizeCardByText(imageData, allCards);
+      // Try training-based recognition first (most reliable for learned cards)
+      const trainingResult = await recognizeWithTraining(imageData, allCards);
       
       let recognitionResult;
       let recognizedCard;
       
-      if (textResult.card && textResult.confidence > 0.7) {
-        // High confidence text recognition
-        recognitionResult = {
-          card: textResult.card,
-          confidence: textResult.confidence,
-          isLearned: false,
-          method: 'openai-vision'
-        };
-        recognizedCard = textResult.card;
-        console.log(`✅ OpenAI Vision recognized: ${textResult.card.name} (confidence: ${textResult.confidence})`);
+      if (trainingResult.confidence > 0.8) {
+        // High confidence from training
+        recognitionResult = trainingResult;
+        recognizedCard = trainingResult.card;
+        console.log(`✅ Training system recognized: ${trainingResult.card.name}`);
       } else {
-        // Fall back to training-based recognition
-        const trainingResult = await recognizeWithTraining(imageData, allCards);
+        // Try free OCR.space API for text recognition
+        const freeOCRResult = await recognizeWithFreeOCR(imageData, allCards);
         
-        if (trainingResult.confidence > 0.8) {
-          // High confidence from training
-          recognitionResult = trainingResult;
-          recognizedCard = trainingResult.card;
-        } else {
-          // Use advanced image recognition as final fallback
-          const advancedResult = await advancedImageRecognition(imageData, allCards);
+        if (freeOCRResult.card && freeOCRResult.confidence > 0.6) {
+          // Good confidence from free OCR
           recognitionResult = {
-            card: advancedResult.card,
-            confidence: Math.max(advancedResult.confidence, trainingResult.confidence),
-            isLearned: advancedResult.isLearned,
-            method: trainingResult.confidence > advancedResult.confidence ? 'pattern-based' : advancedResult.method
+            card: freeOCRResult.card,
+            confidence: freeOCRResult.confidence,
+            isLearned: false,
+            method: 'free-ocr'
           };
-          recognizedCard = trainingResult.confidence > advancedResult.confidence ? trainingResult.card : advancedResult.card;
+          recognizedCard = freeOCRResult.card;
+          console.log(`✅ Free OCR recognized: ${freeOCRResult.card.name} (confidence: ${freeOCRResult.confidence})`);
+        } else {
+          // Try OpenAI Vision as backup (if API available)
+          try {
+            const textResult = await recognizeCardByText(imageData, allCards);
+            
+            if (textResult.card && textResult.confidence > 0.7) {
+              recognitionResult = {
+                card: textResult.card,
+                confidence: textResult.confidence,
+                isLearned: false,
+                method: 'openai-vision'
+              };
+              recognizedCard = textResult.card;
+              console.log(`✅ OpenAI Vision recognized: ${textResult.card.name}`);
+            } else {
+              // Final fallback to pattern matching
+              const advancedResult = await advancedImageRecognition(imageData, allCards);
+              recognitionResult = {
+                card: advancedResult.card,
+                confidence: Math.max(advancedResult.confidence, trainingResult.confidence, freeOCRResult.confidence),
+                isLearned: advancedResult.isLearned,
+                method: 'pattern-based'
+              };
+              recognizedCard = advancedResult.card;
+            }
+          } catch (openAIError) {
+            console.log('OpenAI Vision unavailable, using pattern matching');
+            const advancedResult = await advancedImageRecognition(imageData, allCards);
+            recognitionResult = {
+              card: advancedResult.card,
+              confidence: Math.max(advancedResult.confidence, trainingResult.confidence, freeOCRResult.confidence),
+              isLearned: advancedResult.isLearned,
+              method: 'pattern-based'
+            };
+            recognizedCard = advancedResult.card;
+          }
         }
       }
       

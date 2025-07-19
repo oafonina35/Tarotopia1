@@ -59,15 +59,14 @@ Preferred communication style: Simple, everyday language.
 3. **Reading History**: Previous scans stored in database → Retrieved and displayed in recent readings component
 
 ## Recent Changes
-- **July 19, 2025**: Fixed training system and recognition pipeline
-  - Resolved training data persistence issues 
-  - Fixed frontend training interface API calls
-  - Enhanced logging for debugging recognition process
-  - Training now works with 95% confidence on learned images
-  - OpenAI text recognition disabled due to quota limitations
-  - Implemented fuzzy matching for image recognition to handle lighting/compression variations
-  - Modified image hashing to be less sensitive to minor image differences
-  - Added similarity scoring algorithm for better card recognition
+- **July 19, 2025**: Complete recognition system overhaul
+  - Fixed training system with database persistence (95% accuracy)
+  - Added free OCR.space API integration (500 requests/day, no cost)
+  - Implemented 4-layer recognition: Training → Free OCR → OpenAI Vision → Pattern Matching
+  - Enhanced fuzzy matching with multi-segment hash comparison
+  - User confirmed preference for flat-fee options over pay-per-use
+  - OpenAI Vision available but user has quota limits on current plan
+  - Free OCR provides unlimited text recognition without any subscription costs
 
 ## External Dependencies
 

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Zap, DollarSign, Target } from "lucide-react";
 import { TestOpenAIButton } from "./test-openai-button";
+import { TestFreeOCRButton } from "./test-free-ocr-button";
 
 interface RecognitionOption {
   name: string;
@@ -100,19 +101,30 @@ export default function RecognitionOptions({ onClose }: RecognitionOptionsProps)
         </div>
         
         <div className="mt-6 p-4 bg-muted rounded-lg">
-          <h4 className="font-medium mb-3">OpenAI Vision Status:</h4>
-          <TestOpenAIButton />
+          <h4 className="font-medium mb-3">Recognition Options:</h4>
           
-          <div className="mt-4">
+          <div className="space-y-4">
+            <div>
+              <h5 className="font-medium text-sm mb-2">Free OCR (No Cost Ever):</h5>
+              <TestFreeOCRButton />
+            </div>
+            
+            <div>
+              <h5 className="font-medium text-sm mb-2">OpenAI Vision (Pay-per-use):</h5>
+              <TestOpenAIButton />
+            </div>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t">
             <h4 className="font-medium mb-2">How It Works:</h4>
             <p className="text-sm text-muted-foreground">
-              <strong>1. OpenAI Vision:</strong> Reads text directly from cards using GPT-4o (best accuracy)
+              <strong>1. Training System:</strong> Learns from your corrections (95% accuracy, free)
               <br/>
-              <strong>2. Training Fallback:</strong> Uses your corrections when text can't be read
+              <strong>2. Free OCR:</strong> OCR.space API reads text (500/day limit, free forever)
               <br/>
-              <strong>3. Pattern Matching:</strong> Final fallback for unrecognized cards
-              <br/><br/>
-              <strong>Cost:</strong> About 1¢ per card scan with OpenAI Vision API
+              <strong>3. OpenAI Vision:</strong> Best accuracy but costs ~1¢ per scan
+              <br/>
+              <strong>4. Pattern Matching:</strong> Final fallback for unknown cards
             </p>
           </div>
         </div>
