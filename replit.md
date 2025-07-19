@@ -73,6 +73,8 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
   - Enhanced fuzzy matching with multi-segment hash comparison
   - User confirmed preference for flat-fee options over pay-per-use
   - Added permanent manual card selection button for easy deck browsing
+  - Restored full card descriptions without truncation (complete 1200+ character descriptions)
+  - Fixed paragraph spacing across all pages with proper line break handling and margin spacing
 
 ## External Dependencies
 

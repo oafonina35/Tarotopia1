@@ -68,8 +68,8 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
         <div>
           <h4 className="text-lg font-serif font-semibold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>Meaning</h4>
           <div className="text-foreground/90 text-sm leading-relaxed">
-            {card.meaning.split('\n\n').map((paragraph, index) => (
-              <p key={index} className="mb-4 last:mb-0">
+            {card.meaning.split('\n').filter(line => line.trim()).map((paragraph, index, filteredArray) => (
+              <p key={index} className={index < filteredArray.length - 1 ? "mb-4" : ""}>
                 {paragraph.trim()}
               </p>
             ))}
