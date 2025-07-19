@@ -96,7 +96,7 @@ export default function DailyCard() {
               {formatDate()}
             </CardDescription>
             <p className="text-sm text-slate-600 mt-2">
-              Draw a card to receive guidance and insight for your day ahead
+              Receive guidance and insight for your day ahead
             </p>
           </CardHeader>
           
@@ -114,7 +114,7 @@ export default function DailyCard() {
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-teal-700">Ready for Your Daily Guidance?</h3>
                   <p className="text-slate-600 max-w-md mx-auto">
-                    Take a moment to center yourself, then draw your card to discover what the universe wants you to know today.
+                    Take a moment to center yourself, then discover what the universe wants you to know today.
                   </p>
                   
                   <Button 
@@ -138,55 +138,53 @@ export default function DailyCard() {
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold text-teal-700 mb-4">Your Card for Today</h3>
+                <div className="text-center space-y-6">
+                  <h3 className="text-xl font-semibold text-teal-700">Your Card for Today</h3>
                   
-                  <div className="flex justify-center gap-6">
-                    {currentCard.imageUrl && (
-                      <div className="w-48 h-72 rounded-lg border-2 border-teal-200 overflow-hidden shadow-lg">
-                        <img
-                          src={currentCard.imageUrl.replace('@assets/', '/attached_assets/')}
-                          alt={currentCard.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
-                        />
+                  {currentCard.imageUrl && (
+                    <div className="w-48 h-72 mx-auto rounded-lg border-2 border-teal-200 overflow-hidden shadow-lg">
+                      <img
+                        src={currentCard.imageUrl.replace('@assets/', '/attached_assets/')}
+                        alt={currentCard.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <h4 className="text-2xl font-bold text-teal-700 mb-2">{currentCard.name}</h4>
+                      <div className="flex justify-center gap-2 mb-4">
+                        <Badge variant={currentCard.arcana === 'Major' ? 'default' : 'secondary'}>
+                          {currentCard.arcana} Arcana
+                        </Badge>
+                        {currentCard.suit && (
+                          <Badge variant="outline">{currentCard.suit}</Badge>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {currentCard.meaning && (
+                      <div className="text-left max-w-2xl mx-auto">
+                        <h5 className="font-semibold text-teal-600 mb-2">Today's Message:</h5>
+                        <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                          {currentCard.meaning.split('\n\n')[0]}
+                        </p>
                       </div>
                     )}
                     
-                    <div className="flex-1 max-w-md text-left space-y-4">
-                      <div>
-                        <h4 className="text-2xl font-bold text-teal-700 mb-2">{currentCard.name}</h4>
-                        <div className="flex gap-2 mb-4">
-                          <Badge variant={currentCard.arcana === 'Major' ? 'default' : 'secondary'}>
-                            {currentCard.arcana} Arcana
-                          </Badge>
-                          {currentCard.suit && (
-                            <Badge variant="outline">{currentCard.suit}</Badge>
-                          )}
-                        </div>
+                    {currentCard.keywords && (
+                      <div className="text-left max-w-2xl mx-auto">
+                        <h5 className="font-semibold text-teal-600 mb-2">Focus Areas:</h5>
+                        <p className="text-sm text-slate-600">
+                          {currentCard.keywords}
+                        </p>
                       </div>
-                      
-                      {currentCard.meaning && (
-                        <div>
-                          <h5 className="font-semibold text-teal-600 mb-2">Today's Message:</h5>
-                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
-                            {currentCard.meaning.split('\n\n')[0]}
-                          </p>
-                        </div>
-                      )}
-                      
-                      {currentCard.keywords && (
-                        <div>
-                          <h5 className="font-semibold text-teal-600 mb-2">Focus Areas:</h5>
-                          <p className="text-sm text-slate-600">
-                            {currentCard.keywords}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
                 
