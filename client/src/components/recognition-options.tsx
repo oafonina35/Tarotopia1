@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Zap, DollarSign, Target } from "lucide-react";
 import { TestOpenAIButton } from "./test-openai-button";
 import { TestFreeOCRButton } from "./test-free-ocr-button";
+import { UnlimitedOCROptions } from "./unlimited-ocr-options";
 
 interface RecognitionOption {
   name: string;
@@ -116,18 +117,22 @@ export default function RecognitionOptions({ onClose }: RecognitionOptionsProps)
           </div>
           
           <div className="mt-4 pt-4 border-t">
-            <h4 className="font-medium mb-2">How It Works:</h4>
+            <h4 className="font-medium mb-2">Current Recognition Flow:</h4>
             <p className="text-sm text-muted-foreground">
-              <strong>1. Training System:</strong> Learns from your corrections (95% accuracy, free)
+              <strong>1. Training System:</strong> Learns from your corrections (95% accuracy, unlimited)
               <br/>
-              <strong>2. Free OCR:</strong> OCR.space API reads text (500/day limit, free forever)
+              <strong>2. Tesseract OCR:</strong> Unlimited offline text recognition (downloaded once)
               <br/>
-              <strong>3. OpenAI Vision:</strong> Best accuracy but costs ~1¢ per scan
+              <strong>3. Free OCR API:</strong> OCR.space backup (500/day limit)
               <br/>
-              <strong>4. Pattern Matching:</strong> Final fallback for unknown cards
+              <strong>4. OpenAI Vision:</strong> Best accuracy but costs ~1¢ per scan
+              <br/>
+              <strong>5. Pattern Matching:</strong> Final fallback for unknown cards
             </p>
           </div>
         </div>
+        
+        <UnlimitedOCROptions />
         
         {onClose && (
           <div className="flex justify-end pt-4">

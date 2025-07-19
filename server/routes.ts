@@ -6,6 +6,7 @@ import { recognizeCardByText } from "./text-recognition";
 import { recognizeWithTraining, trainCard, getTrainingStats } from "./manual-training-recognition";
 import { advancedImageRecognition, RECOGNITION_OPTIONS } from "./advanced-recognition";
 import { recognizeWithFreeOCR } from "./free-ocr-recognition";
+import { recognizeWithTesseract } from "./unlimited-ocr";
 import { z } from "zod";
 
 const cardRecognitionSchema = z.object({
@@ -73,20 +74,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         recognizedCard = trainingResult.card;
         console.log(`✅ Training system recognized: ${trainingResult.card.name}`);
       } else {
-        // Try free OCR.space API for text recognition
-        const freeOCRResult = await recognizeWithFreeOCR(imageData, allCards);
+        // Try Tesseract.js unlimited OCR first
+        const tesseractResult = await recognizeWithTesseract(imageData, allCards);
         
-        if (freeOCRResult.card && freeOCRResult.confidence > 0.6) {
-          // Good confidence from free OCR
+        if (tesseractResult.card && tesseractResult.confidence > 0.7) {
+          // High confidence from Tesseract
           recognitionResult = {
-            card: freeOCRResult.card,
-            confidence: freeOCRResult.confidence,
+            card: tesseractResult.card,
+            confidence: tesseractResult.confidence,
             isLearned: false,
-            method: 'free-ocr'
+            method: 'tesseract'
           };
-          recognizedCard = freeOCRResult.card;
-          console.log(`✅ Free OCR recognized: ${freeOCRResult.card.name} (confidence: ${freeOCRResult.confidence})`);
+          recognizedCard = tesseractResult.card;
+          console.log(`✅ Tesseract OCR recognized: ${tesseractResult.card.name} (confidence: ${tesseractResult.confidence})`);
         } else {
+          // Try free OCR.space API for text recognition
+          const freeOCRResult = await recognizeWithFreeOCR(imageData, allCards);
+          
+          if (freeOCRResult.card && freeOCRResult.confidence > 0.6) {
+            // Good confidence from free OCR
+            recognitionResult = {
+              card: freeOCRResult.card,
+              confidence: freeOCRResult.confidence,
+              isLearned: false,
+              method: 'free-ocr'
+            };
+            recognizedCard = freeOCRResult.card;
+            console.log(`✅ Free OCR recognized: ${freeOCRResult.card.name} (confidence: ${freeOCRResult.confidence})`);
+          } else {
           // Try OpenAI Vision as backup (if API available)
           try {
             const textResult = await recognizeCardByText(imageData, allCards);
@@ -105,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const advancedResult = await advancedImageRecognition(imageData, allCards);
               recognitionResult = {
                 card: advancedResult.card,
-                confidence: Math.max(advancedResult.confidence, trainingResult.confidence, freeOCRResult.confidence),
+                confidence: Math.max(advancedResult.confidence, trainingResult.confidence, tesseractResult.confidence, freeOCRResult.confidence),
                 isLearned: advancedResult.isLearned,
                 method: 'pattern-based'
               };
@@ -116,11 +131,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const advancedResult = await advancedImageRecognition(imageData, allCards);
             recognitionResult = {
               card: advancedResult.card,
-              confidence: Math.max(advancedResult.confidence, trainingResult.confidence, freeOCRResult.confidence),
+              confidence: Math.max(advancedResult.confidence, trainingResult.confidence, tesseractResult.confidence, freeOCRResult.confidence),
               isLearned: advancedResult.isLearned,
               method: 'pattern-based'
             };
             recognizedCard = advancedResult.card;
+          }
           }
         }
       }
