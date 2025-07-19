@@ -54,6 +54,15 @@ export default function ManualCardSelector({ onCardSelected, onClose }: ManualCa
     createReadingMutation.mutate(card);
   };
 
+  const handleQuickTest = (cardName: string) => {
+    const matchedCard = cards.find((card: TarotCard) => 
+      card.name.toLowerCase().includes(cardName.toLowerCase())
+    );
+    if (matchedCard) {
+      handleCardSelect(matchedCard);
+    }
+  };
+
   return (
     <div className="card-gradient rounded-2xl p-6 border border-mystic-purple/30 backdrop-blur-sm mb-6">
       <div className="flex items-center justify-between mb-4">
