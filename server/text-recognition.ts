@@ -30,7 +30,7 @@ export async function recognizeCardByText(imageData: string, allCards: TarotCard
           content: [
             {
               type: "text",
-              text: "Look at this tarot card image and extract ONLY the card name/title text that appears on it. Return just the card name, nothing else. If you can't clearly read the text, return 'UNCLEAR'."
+              text: "You are looking at a tarot card image. Please identify the exact card name shown in the image. Look for text on the card that indicates the card name (like 'The Fool', 'Death', 'Queen of Cups', '5 of Swords', etc.). Return ONLY the card name you can read, no other text or explanation. If the text is unclear or you cannot determine the card name, return 'UNCLEAR'."
             },
             {
               type: "image_url",

@@ -114,19 +114,29 @@ function createImageHash(imageData: string): string {
   // Remove data URL prefix and normalize
   const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
   
-  // Create a content-based hash that's less sensitive to compression
-  let hash = 0;
-  const step = Math.max(1, Math.floor(base64Data.length / 200)); // Sample every nth character
+  // Create multiple hash points for better matching
+  const dataLength = base64Data.length;
+  const segments = 5; // Create 5 hash segments
+  let combinedHash = '';
   
-  for (let i = 0; i < base64Data.length; i += step) {
-    const char = base64Data.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+  for (let segment = 0; segment < segments; segment++) {
+    const startPos = Math.floor((dataLength / segments) * segment);
+    const endPos = Math.floor((dataLength / segments) * (segment + 1));
+    const segmentData = base64Data.substring(startPos, endPos);
+    
+    let segmentHash = 0;
+    for (let i = 0; i < Math.min(segmentData.length, 20); i++) { // Sample first 20 chars of each segment
+      const char = segmentData.charCodeAt(i);
+      segmentHash = ((segmentHash << 3) - segmentHash) + char;
+      segmentHash = segmentHash & segmentHash;
+    }
+    
+    combinedHash += Math.abs(segmentHash).toString(16).substring(0, 4);
   }
   
-  // Use size categories instead of exact length (more forgiving)
-  const sizeCategory = Math.floor(base64Data.length / 10000); // Group by 10KB chunks
-  return `${Math.abs(hash).toString(16)}-${sizeCategory}`;
+  // Use broader size categories (more forgiving for compression differences)
+  const sizeCategory = Math.floor(dataLength / 5000); // Group by 5KB chunks
+  return `${combinedHash}-${sizeCategory}`;
 }
 
 // Legacy hash function for backwards compatibility
@@ -202,27 +212,41 @@ function findSimilarTrainedImage(targetHash: string, allCards: TarotCard[]): Tar
     const sizeDiff = Math.abs(targetSize - trainedSize);
     const sizeMatch = sizeDiff <= 2; // Allow up to 2 size categories difference
     
-    // Hash similarity (check if hashes are close)
-    const targetHashNum = parseInt(targetHashValue, 16);
-    const trainedHashNum = parseInt(trainedHashValue, 16);
+    // Multi-segment hash similarity for better matching
+    const targetSegments = targetHashValue.match(/.{1,4}/g) || [];
+    const trainedSegments = trainedHashValue.match(/.{1,4}/g) || [];
     
-    if (!isNaN(targetHashNum) && !isNaN(trainedHashNum)) {
-      const hashDiff = Math.abs(targetHashNum - trainedHashNum);
-      const maxHash = Math.max(targetHashNum, trainedHashNum);
-      const hashSimilarity = maxHash > 0 ? Math.max(0, 1 - (hashDiff / maxHash)) : 0;
+    let segmentMatches = 0;
+    let totalSegments = Math.max(targetSegments.length, trainedSegments.length);
+    
+    for (let i = 0; i < Math.min(targetSegments.length, trainedSegments.length); i++) {
+      const targetSegNum = parseInt(targetSegments[i], 16);
+      const trainedSegNum = parseInt(trainedSegments[i], 16);
       
-      // Combined similarity score
-      let similarity = 0;
-      if (sizeMatch) {
-        similarity = hashSimilarity * 0.7 + (1 - sizeDiff / 10) * 0.3;
+      if (!isNaN(targetSegNum) && !isNaN(trainedSegNum)) {
+        const segmentDiff = Math.abs(targetSegNum - trainedSegNum);
+        const maxSegment = Math.max(targetSegNum, trainedSegNum);
+        const segmentSimilarity = maxSegment > 0 ? (1 - (segmentDiff / maxSegment)) : 1;
+        
+        if (segmentSimilarity > 0.7) { // Segment matches if 70% similar
+          segmentMatches++;
+        }
       }
-      
-      console.log(`  📊 Same-format comparing with ${trainedHash}: size match=${sizeMatch}, hash sim=${hashSimilarity.toFixed(3)}, total sim=${similarity.toFixed(3)}`);
-      
-      if (similarity > 0.4 && (!bestMatch || similarity > bestMatch.similarity)) {
-        bestMatch = { cardId, similarity };
-        console.log(`  ✨ New best match: Card ${cardId} with similarity ${similarity.toFixed(3)}`);
-      }
+    }
+    
+    const hashSimilarity = totalSegments > 0 ? (segmentMatches / totalSegments) : 0;
+    
+    // Combined similarity score - more lenient
+    let similarity = 0;
+    if (sizeMatch || sizeDiff <= 3) { // Allow up to 3 size categories difference
+      similarity = hashSimilarity * 0.8 + (1 - Math.min(sizeDiff, 5) / 5) * 0.2;
+    }
+    
+    console.log(`  📊 Multi-segment comparing with ${trainedHash}: size match=${sizeMatch} (diff=${sizeDiff}), hash sim=${hashSimilarity.toFixed(3)}, total sim=${similarity.toFixed(3)}`);
+    
+    if (similarity > 0.5 && (!bestMatch || similarity > bestMatch.similarity)) { // Lower threshold
+      bestMatch = { cardId, similarity };
+      console.log(`  ✨ New best match: Card ${cardId} with similarity ${similarity.toFixed(3)}`);
     }
   }
   

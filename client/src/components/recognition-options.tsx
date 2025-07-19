@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Zap, DollarSign, Target } from "lucide-react";
+import { TestOpenAIButton } from "./test-openai-button";
 
 interface RecognitionOption {
   name: string;
@@ -99,14 +100,21 @@ export default function RecognitionOptions({ onClose }: RecognitionOptionsProps)
         </div>
         
         <div className="mt-6 p-4 bg-muted rounded-lg">
-          <h4 className="font-medium mb-2">Recommendation:</h4>
-          <p className="text-sm text-muted-foreground">
-            <strong>Training System:</strong> The current system works excellently with your custom cards. 
-            Simply scan cards, correct wrong results, and train the scanner - it learns and improves quickly.
-            <br/><br/>
-            <strong>For OCR Text Recognition:</strong> If you need text reading from cards, Google Cloud Vision 
-            offers reliable OCR at $1.50 per 1000 images with excellent accuracy.
-          </p>
+          <h4 className="font-medium mb-3">OpenAI Vision Status:</h4>
+          <TestOpenAIButton />
+          
+          <div className="mt-4">
+            <h4 className="font-medium mb-2">How It Works:</h4>
+            <p className="text-sm text-muted-foreground">
+              <strong>1. OpenAI Vision:</strong> Reads text directly from cards using GPT-4o (best accuracy)
+              <br/>
+              <strong>2. Training Fallback:</strong> Uses your corrections when text can't be read
+              <br/>
+              <strong>3. Pattern Matching:</strong> Final fallback for unrecognized cards
+              <br/><br/>
+              <strong>Cost:</strong> About 1¢ per card scan with OpenAI Vision API
+            </p>
+          </div>
         </div>
         
         {onClose && (
