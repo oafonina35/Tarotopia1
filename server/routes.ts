@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertCardReadingSchema, insertTarotCardSchema } from "@shared/schema";
 import { recognizeCardByText } from "./card-recognition";
+import { recognizeCardBySimpleMatch } from "./simple-text-recognition";
 import { z } from "zod";
 
 const cardRecognitionSchema = z.object({
@@ -58,19 +59,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Use OCR to extract card name from image and match against your deck
+      // Try OCR first if available, then fall back to improved recognition
       let recognizedCard = await recognizeCardByText(imageData, allCards);
       
-      // If OCR fails to find a match, fall back to hash-based selection
+      // If OCR fails, use improved image-based selection
       if (!recognizedCard) {
-        console.log("OCR recognition failed, using fallback method");
-        const imageHash = imageData.split('').reduce((a, b) => {
-          a = ((a << 5) - a) + b.charCodeAt(0);
-          return a & a;
-        }, 0);
-        
-        const cardIndex = Math.abs(imageHash) % allCards.length;
-        recognizedCard = allCards[cardIndex];
+        console.log("Using improved image-based recognition");
+        recognizedCard = await recognizeCardBySimpleMatch(imageData, allCards);
+      }
+      
+      // Final fallback to ensure we always return a card
+      if (!recognizedCard) {
+        console.log("Using final fallback selection");
+        recognizedCard = allCards[0];
       }
       
       // Create a reading record
