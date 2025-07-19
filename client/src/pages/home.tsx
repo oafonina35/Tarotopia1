@@ -3,6 +3,7 @@ import CameraScanner from "@/components/camera-scanner";
 import CardResult from "@/components/card-result";
 import RecentReadings from "@/components/recent-readings";
 import ManualCardSelector from "@/components/manual-card-selector";
+import { TrainingInterface } from "@/components/training-interface";
 import { Button } from "@/components/ui/button";
 import { Star, Menu, BookOpen } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
@@ -122,11 +123,24 @@ export default function Home() {
 
           {/* Card Result */}
           {scanningState === 'result' && recognizedCard && (
-            <CardResult
-              card={recognizedCard}
-              reading={currentReading}
-              onScanAnother={handleScanAnother}
-            />
+            <>
+              <CardResult
+                card={recognizedCard}
+                reading={currentReading}
+                onScanAnother={handleScanAnother}
+              />
+              
+              {/* Training Interface */}
+              <div className="mt-6">
+                <TrainingInterface
+                  scannedImage=""
+                  currentCard={recognizedCard}
+                  confidence={0.75}
+                  isLearned={false}
+                  method="pattern-based"
+                />
+              </div>
+            </>
           )}
 
           {/* Error State */}

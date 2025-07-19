@@ -6,6 +6,7 @@ import { recognizeCardByText } from "./card-recognition";
 import { recognizeCardBySimpleMatch } from "./simple-text-recognition";
 import { trainImageForCard, findTrainedCard } from "./image-training";
 import { enhancedCardRecognition } from "./simple-card-recognition";
+import { recognizeWithTraining, trainCard, getTrainingStats } from "./manual-training-recognition";
 import { z } from "zod";
 
 const cardRecognitionSchema = z.object({
@@ -61,8 +62,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Use enhanced recognition that analyzes image patterns
-      const recognitionResult = await enhancedCardRecognition(imageData, allCards);
+      // Use training-based recognition
+      const recognitionResult = await recognizeWithTraining(imageData, allCards);
       const recognizedCard = recognitionResult.card;
       
       if (!recognizedCard) {
@@ -83,6 +84,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         card: recognizedCard,
         reading: reading,
         confidence: confidence,
+        isLearned: recognitionResult.isLearned,
+        method: recognitionResult.isLearned ? 'learned' : 'pattern-based'
       });
     } catch (error) {
       console.error("Error recognizing card:", error);
@@ -163,15 +166,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Image data and card ID required" });
       }
 
+      // Get the card details
+      const allCards = await storage.getAllCards();
+      const targetCard = allCards.find(c => c.id === cardId);
+      
+      if (!targetCard) {
+        return res.status(404).json({ error: "Card not found" });
+      }
+
+      // Train the new system
+      trainCard(imageData, targetCard);
+      
+      // Also train the old system for backward compatibility
       trainImageForCard(imageData, cardId);
       
       res.json({ 
         success: true, 
-        message: `Image trained for card ID ${cardId}` 
+        message: `Image trained for ${targetCard.name}`,
+        cardName: targetCard.name
       });
     } catch (error) {
       console.error("Error training card:", error);
       res.status(500).json({ error: "Failed to train card" });
+    }
+  });
+
+  // Get training statistics
+  app.get("/api/training-stats", async (req, res) => {
+    try {
+      const stats = getTrainingStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting training stats:", error);
+      res.status(500).json({ error: "Failed to get training stats" });
     }
   });
 
