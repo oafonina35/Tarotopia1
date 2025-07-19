@@ -64,18 +64,18 @@ export default function RecentReadings() {
   if (isLoading) {
     return (
       <div className="mt-8">
-        <h3 className="text-xl font-serif font-semibold text-mystic-gold mb-4 text-center">Recent Readings</h3>
+        <h3 className="text-xl font-serif font-semibold mb-4 text-center" style={{ color: 'hsl(180, 45%, 35%)' }}>Recent Readings</h3>
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="bg-charcoal/50 rounded-xl p-4 border border-mystic-purple/20 backdrop-blur-sm">
+            <div key={i} className="bg-card/80 rounded-xl p-4 border border-border backdrop-blur-sm">
               <div className="flex items-center space-x-3">
-                <Skeleton className="w-12 h-18 bg-mystic-purple/20" />
+                <Skeleton className="w-12 h-18 bg-muted" />
                 <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 bg-mystic-purple/20" />
-                  <Skeleton className="h-3 w-20 bg-mystic-purple/20" />
-                  <Skeleton className="h-3 w-32 bg-mystic-purple/20" />
+                  <Skeleton className="h-4 bg-muted" />
+                  <Skeleton className="h-3 w-20 bg-muted" />
+                  <Skeleton className="h-3 w-32 bg-muted" />
                 </div>
-                <Skeleton className="w-8 h-8 bg-mystic-purple/20" />
+                <Skeleton className="w-8 h-8 bg-muted" />
               </div>
             </div>
           ))}
@@ -87,11 +87,11 @@ export default function RecentReadings() {
   if (!readings || readings.length === 0) {
     return (
       <div className="mt-8">
-        <h3 className="text-xl font-serif font-semibold text-mystic-gold mb-4 text-center">Recent Readings</h3>
+        <h3 className="text-xl font-serif font-semibold mb-4 text-center" style={{ color: 'hsl(180, 45%, 35%)' }}>Recent Readings</h3>
         <div className="text-center py-8">
-          <Star className="w-12 h-12 text-mystic-gold/50 mx-auto mb-4" />
-          <p className="text-gray-400 text-sm">No readings yet</p>
-          <p className="text-gray-500 text-xs mt-1">Scan your first card to begin your mystical journey</p>
+          <Star className="w-12 h-12 mx-auto mb-4" style={{ color: 'hsl(180, 35%, 60%)' }} />
+          <p className="text-card-foreground text-sm">No readings yet</p>
+          <p className="text-muted-foreground text-xs mt-1">Scan your first card to begin your mystical journey</p>
         </div>
       </div>
     );
@@ -99,26 +99,26 @@ export default function RecentReadings() {
 
   return (
     <div className="mt-8">
-      <h3 className="text-xl font-serif font-semibold text-mystic-gold mb-4 text-center">Recent Readings</h3>
+      <h3 className="text-xl font-serif font-semibold mb-4 text-center" style={{ color: 'hsl(180, 45%, 35%)' }}>Recent Readings</h3>
       
       <div className="space-y-3">
         {readings.map((reading) => (
           <div
             key={reading.id}
-            className="bg-charcoal/50 rounded-xl p-4 border border-mystic-purple/20 backdrop-blur-sm"
+            className="bg-card/80 rounded-xl p-4 border border-border backdrop-blur-sm"
           >
             <div className="flex items-center space-x-3">
               {/* Card Image Placeholder */}
-              <div className="w-12 h-18 bg-gradient-to-br from-mystic-purple to-cosmic-blue rounded border border-mystic-gold/30 flex items-center justify-center flex-shrink-0">
-                <Star className="w-4 h-4 text-mystic-gold" fill="currentColor" />
+              <div className="w-12 h-18 bg-gradient-to-br from-secondary to-accent rounded border border-primary/30 flex items-center justify-center flex-shrink-0">
+                <Star className="w-4 h-4" style={{ color: 'hsl(180, 45%, 35%)' }} fill="currentColor" />
               </div>
               
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-gray-200 truncate">{reading.cardName}</h4>
-                <p className="text-xs text-gray-400">
+                <h4 className="font-medium text-card-foreground truncate">{reading.cardName}</h4>
+                <p className="text-xs text-muted-foreground">
                   {formatTimeAgo(reading.timestamp)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1 truncate">
+                <p className="text-xs text-muted-foreground mt-1 truncate">
                   {getShortMeaning(reading.cardName)}
                 </p>
               </div>
@@ -126,7 +126,8 @@ export default function RecentReadings() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-mystic-gold hover:bg-mystic-gold/10 flex-shrink-0"
+                className="flex-shrink-0 hover:bg-accent/50"
+                style={{ color: 'hsl(180, 45%, 35%)' }}
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>

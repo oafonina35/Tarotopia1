@@ -95,18 +95,11 @@ export default function Home() {
           {/* Welcome Section */}
           {scanningState === 'ready' && (
             <div className="text-center mb-8">
-              <div 
-                className="relative mb-6 h-32 rounded-2xl overflow-hidden"
-                style={{
-                  backgroundImage: 'url(https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-soft-mauve via-cosmic-turquoise/50 to-transparent"></div>
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-                  <h2 className="text-2xl font-serif font-bold text-primary mb-2">Discover Your Path</h2>
-                  <p className="text-sm text-foreground/80 max-w-64">Scan any tarot card to reveal its mystical meanings and guidance</p>
+              <div className="relative mb-6 h-32 rounded-2xl overflow-hidden bg-card border border-border">
+                <div className="absolute inset-0 bg-gradient-to-br from-card/95 via-card/90 to-accent/20"></div>
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
+                  <h2 className="text-2xl font-serif font-bold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>Discover Your Path</h2>
+                  <p className="text-sm text-card-foreground max-w-64">Scan any tarot card to reveal its mystical meanings and guidance</p>
                 </div>
               </div>
             </div>
