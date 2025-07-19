@@ -1,8 +1,13 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, Sparkles } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Search, Wand2 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { TarotCard, CardReading } from "@shared/schema";
 
 interface ManualCardSelectorProps {
@@ -12,132 +17,126 @@ interface ManualCardSelectorProps {
 
 export default function ManualCardSelector({ onCardSelected, onClose }: ManualCardSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-  const { data: cards = [], isLoading } = useQuery({
-    queryKey: ["/api/cards"],
+  const { data: cards = [] } = useQuery<TarotCard[]>({
+    queryKey: ['/api/cards'],
   });
 
   const createReadingMutation = useMutation({
-    mutationFn: async (card: TarotCard) => {
-      // Create reading directly for the selected card
-      const response = await fetch("/api/readings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cardId: card.id,
-          cardName: card.name,
-          imageData: `manual_selection_${card.id}_${Date.now()}`,
-        }),
+    mutationFn: async (cardId: number): Promise<CardReading> => {
+      const response = await apiRequest('POST', '/api/readings', { 
+        cardId, 
+        imageData: null,
+        confidence: 1.0,
+        method: 'manual_selection'
       });
-      
-      if (!response.ok) {
-        throw new Error("Failed to create reading");
-      }
-      
-      const reading = await response.json();
-      return { card, reading };
+      return response.json();
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/readings"] });
-      onCardSelected(data.card, data.reading);
+    onSuccess: (reading, cardId) => {
+      const selectedCard = cards.find(c => c.id === cardId);
+      if (selectedCard) {
+        onCardSelected(selectedCard, reading);
+        toast({
+          title: "Card Selected!",
+          description: `You chose "${selectedCard.name}" - view the full reading below.`,
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create reading. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
-  const filteredCards = cards.filter((card: TarotCard) =>
+  const filteredCards = cards.filter(card =>
     card.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     card.arcana.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (card.suit && card.suit.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleCardSelect = (card: TarotCard) => {
-    createReadingMutation.mutate(card);
-  };
-
-  const handleQuickTest = (cardName: string) => {
-    const matchedCard = cards.find((card: TarotCard) => 
-      card.name.toLowerCase().includes(cardName.toLowerCase())
-    );
-    if (matchedCard) {
-      handleCardSelect(matchedCard);
-    }
+    createReadingMutation.mutate(card.id);
   };
 
   return (
-    <div className="card-gradient rounded-2xl p-6 border border-mystic-purple/30 backdrop-blur-sm mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-serif font-semibold text-mystic-gold">Browse Your Custom Deck</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-300"
-        >
-          ✕
-        </Button>
-      </div>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Wand2 className="h-5 w-5" />
+          Choose Your Card
+        </CardTitle>
+        <CardDescription>
+          Select any card from your deck to view its meaning and guidance
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search cards by name, arcana, or suit..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1"
+          />
+        </div>
 
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <Input
-          placeholder="Search cards by name, arcana, or suit..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 bg-rich-black/50 border-mystic-purple/30 text-gray-300 placeholder-gray-500"
-        />
-      </div>
-
-      <div className="max-h-64 overflow-y-auto space-y-2">
-        {isLoading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin w-6 h-6 border-2 border-mystic-gold border-t-transparent rounded-full mx-auto mb-2"></div>
-            <p className="text-gray-400 text-sm">Loading your custom deck...</p>
-          </div>
-        ) : filteredCards.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-400 text-sm">No cards found matching "{searchTerm}"</p>
-          </div>
-        ) : (
-          filteredCards.map((card: TarotCard) => (
-            <div
-              key={card.id}
-              className="flex items-center justify-between p-3 bg-rich-black/30 rounded-lg border border-mystic-purple/20 hover:border-mystic-gold/50 transition-colors cursor-pointer"
-              onClick={() => handleCardSelect(card)}
-            >
-              <div className="flex-1">
-                <h4 className="font-medium text-gray-300">{card.name}</h4>
-                <div className="flex items-center space-x-2 text-xs text-gray-500">
-                  <span>{card.arcana} Arcana</span>
-                  {card.suit && <span>• {card.suit}</span>}
-                  {card.number && <span>• #{card.number}</span>}
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                {card.imageUrl && (
-                  <div className="w-8 h-8 bg-mystic-purple/20 rounded border border-mystic-purple/30 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-mystic-gold" />
+        <ScrollArea className="h-96 w-full">
+          <div className="grid gap-2 pr-4">
+            {filteredCards.map((card) => (
+              <Card
+                key={card.id}
+                className="cursor-pointer hover:shadow-md transition-shadow border-muted hover:border-primary/50"
+                onClick={() => handleCardSelect(card)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg">{card.name}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant={card.arcana === 'Major' ? 'default' : 'secondary'}>
+                          {card.arcana} Arcana
+                        </Badge>
+                        {card.suit && (
+                          <Badge variant="outline">{card.suit}</Badge>
+                        )}
+                      </div>
+                    </div>
+                    {card.imageUrl && (
+                      <div className="w-12 h-16 rounded border overflow-hidden ml-4 flex-shrink-0">
+                        <img
+                          src={card.imageUrl}
+                          alt={card.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
-                )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-mystic-gold/30 text-mystic-gold hover:bg-mystic-gold/10"
-                  disabled={createReadingMutation.isPending}
-                >
-                  {createReadingMutation.isPending ? "..." : "Select"}
-                </Button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </ScrollArea>
 
-      <div className="mt-4 p-3 bg-mystic-purple/10 rounded-lg border border-mystic-purple/20">
-        <p className="text-xs text-gray-400">
-          <strong className="text-mystic-gold">Note:</strong> This manual selector lets you test your custom deck descriptions. 
-          Real image recognition would analyze uploaded photos to automatically identify cards.
-        </p>
-      </div>
-    </div>
+        {filteredCards.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            No cards found matching "{searchTerm}"
+          </div>
+        )}
+
+        <div className="flex justify-between pt-4">
+          <Button variant="outline" onClick={onClose}>
+            Back to Scanner
+          </Button>
+          <p className="text-sm text-muted-foreground self-center">
+            {filteredCards.length} cards available
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
