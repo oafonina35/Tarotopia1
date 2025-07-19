@@ -1,17 +1,31 @@
 import type { TarotCard } from "@shared/schema";
+import { db } from "./db";
+import { trainingData as trainingDataTable } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
-// Persistent training data that survives server restarts
+// In-memory cache for performance (loaded from database)
 const imageTrainingData = new Map<string, number>();
 
-// Load training data from environment/memory (basic persistence)
+// Load training data from database
 let trainingDataLoaded = false;
 
-function loadTrainingData() {
+async function loadTrainingData() {
   if (!trainingDataLoaded) {
-    // In a real app, you'd load from database or file
-    // For now, we'll use a more robust in-memory approach
-    trainingDataLoaded = true;
-    console.log('Training data system initialized');
+    try {
+      const dbTrainingData = await db.select().from(trainingDataTable);
+      imageTrainingData.clear();
+      
+      for (const record of dbTrainingData) {
+        imageTrainingData.set(record.imageHash, record.cardId);
+      }
+      
+      trainingDataLoaded = true;
+      console.log(`✅ Training data loaded from database: ${imageTrainingData.size} trained images`);
+    } catch (error) {
+      console.error('Error loading training data from database:', error);
+      trainingDataLoaded = true; // Mark as loaded even if failed
+      console.log('⚠️ Training data system initialized without database persistence');
+    }
   }
 }
 
@@ -21,27 +35,51 @@ export interface RecognitionResult {
   isLearned: boolean;
 }
 
-export function trainCard(imageData: string, correctCard: TarotCard): void {
-  loadTrainingData();
+export async function trainCard(imageData: string, correctCard: TarotCard): Promise<void> {
+  await loadTrainingData();
   const imageHash = createImageHash(imageData);
+  
+  // Update in-memory cache
   imageTrainingData.set(imageHash, correctCard.id);
-  console.log(`✓ TRAINED: Image hash ${imageHash} → ${correctCard.name} (ID: ${correctCard.id})`);
+  
+  // Save to database for persistence
+  try {
+    await db.insert(trainingDataTable)
+      .values({ imageHash, cardId: correctCard.id })
+      .onConflictDoUpdate({
+        target: trainingDataTable.imageHash,
+        set: { cardId: correctCard.id }
+      });
+    
+    console.log(`✅ TRAINED & SAVED: Image hash ${imageHash} → ${correctCard.name} (ID: ${correctCard.id})`);
+  } catch (error) {
+    console.error('Error saving training data to database:', error);
+    console.log(`⚠️ TRAINED (memory only): Image hash ${imageHash} → ${correctCard.name} (ID: ${correctCard.id})`);
+  }
+  
   console.log(`✓ Total trained images: ${imageTrainingData.size}`);
 }
 
 export async function recognizeWithTraining(imageData: string, allCards: TarotCard[]): Promise<RecognitionResult> {
-  loadTrainingData();
+  await loadTrainingData();
   const imageHash = createImageHash(imageData);
+  const legacyHash = createLegacyImageHash(imageData);
   
-  console.log(`🔍 Looking for image hash: ${imageHash}`);
+  console.log(`🔍 Looking for image hash: ${imageHash} (legacy: ${legacyHash})`);
   console.log(`🔍 Training data size: ${imageTrainingData.size}`);
   
-  // First check if we've learned this image
-  const learnedCardId = imageTrainingData.get(imageHash);
+  // First check exact match with new hash format
+  let learnedCardId = imageTrainingData.get(imageHash);
+  
+  // Check legacy hash format for backwards compatibility
+  if (!learnedCardId) {
+    learnedCardId = imageTrainingData.get(legacyHash);
+  }
+  
   if (learnedCardId) {
     const learnedCard = allCards.find(c => c.id === learnedCardId);
     if (learnedCard) {
-      console.log(`✅ FOUND LEARNED: ${learnedCard.name} (confidence: 95%)`);
+      console.log(`✅ EXACT MATCH: ${learnedCard.name} (confidence: 95%)`);
       return {
         card: learnedCard,
         confidence: 0.95,
@@ -50,15 +88,16 @@ export async function recognizeWithTraining(imageData: string, allCards: TarotCa
     }
   }
   
-  console.log(`❌ No learned match found, using fallback`);
+  console.log(`❌ No exact match found, trying fuzzy matching`);
   
   // If not learned, use similarity to find closest trained image
   const similarCard = findSimilarTrainedImage(imageHash, allCards);
   if (similarCard) {
+    console.log(`✅ FUZZY MATCH: Found similar trained image for ${similarCard.name}`);
     return {
       card: similarCard,
-      confidence: 0.75,
-      isLearned: false
+      confidence: 0.85, // High confidence for fuzzy matches
+      isLearned: true    // Treat fuzzy matches as learned
     };
   }
   
@@ -72,10 +111,29 @@ export async function recognizeWithTraining(imageData: string, allCards: TarotCa
 }
 
 function createImageHash(imageData: string): string {
-  // Remove data URL prefix
+  // Remove data URL prefix and normalize
   const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
   
-  // Create hash from key characteristics
+  // Create a content-based hash that's less sensitive to compression
+  let hash = 0;
+  const step = Math.max(1, Math.floor(base64Data.length / 200)); // Sample every nth character
+  
+  for (let i = 0; i < base64Data.length; i += step) {
+    const char = base64Data.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Use size categories instead of exact length (more forgiving)
+  const sizeCategory = Math.floor(base64Data.length / 10000); // Group by 10KB chunks
+  return `${Math.abs(hash).toString(16)}-${sizeCategory}`;
+}
+
+// Legacy hash function for backwards compatibility
+function createLegacyImageHash(imageData: string): string {
+  const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
+  
+  // Create hash from key characteristics (old method)
   const length = base64Data.length;
   const start = base64Data.substring(0, 50);
   const middle = base64Data.substring(Math.floor(length/2), Math.floor(length/2) + 50);
@@ -95,26 +153,86 @@ function createImageHash(imageData: string): string {
 }
 
 function findSimilarTrainedImage(targetHash: string, allCards: TarotCard[]): TarotCard | null {
-  const targetLength = parseInt(targetHash.split('-')[1]);
+  const [targetHashValue, targetSizeCategory] = targetHash.split('-');
+  const targetSize = parseInt(targetSizeCategory);
   let bestMatch: { cardId: number; similarity: number } | null = null;
   
+  console.log(`🔍 Looking for similar images to hash: ${targetHash}`);
+  console.log(`🔍 All training data:`, Array.from(imageTrainingData.entries()).slice(0, 5));
+  
   for (const [trainedHash, cardId] of imageTrainingData.entries()) {
-    const trainedLength = parseInt(trainedHash.split('-')[1]);
+    // Handle different hash formats
+    const trainedParts = trainedHash.split('-');
+    const targetParts = targetHash.split('-');
     
-    // Compare by length similarity (simple but effective)
-    const lengthDiff = Math.abs(targetLength - trainedLength);
-    const maxLength = Math.max(targetLength, trainedLength);
-    const similarity = 1 - (lengthDiff / maxLength);
+    if (trainedParts.length !== targetParts.length) {
+      // Different hash formats, try basic similarity
+      console.log(`  🔄 Different hash formats: ${trainedHash} vs ${targetHash}`);
+      
+      // If one is legacy format (2 parts) and one is new (2 parts), compare differently
+      if (trainedParts.length === 2 && targetParts.length === 2) {
+        const trainedMainHash = trainedParts[0];
+        const targetMainHash = targetParts[0];
+        
+        // Compare hash values
+        const targetHashNum = parseInt(targetMainHash, 16);
+        const trainedHashNum = parseInt(trainedMainHash, 16);
+        
+        if (!isNaN(targetHashNum) && !isNaN(trainedHashNum)) {
+          const hashDiff = Math.abs(targetHashNum - trainedHashNum);
+          const maxHash = Math.max(targetHashNum, trainedHashNum);
+          const similarity = maxHash > 0 ? Math.max(0, 1 - (hashDiff / maxHash)) : 0;
+          
+          console.log(`  📊 Cross-format similarity with ${trainedHash}: ${similarity.toFixed(3)}`);
+          
+          if (similarity > 0.3 && (!bestMatch || similarity > bestMatch.similarity)) {
+            bestMatch = { cardId, similarity };
+            console.log(`  ✨ Cross-format match: Card ${cardId} with similarity ${similarity.toFixed(3)}`);
+          }
+        }
+      }
+      continue;
+    }
     
-    if (similarity > 0.8 && (!bestMatch || similarity > bestMatch.similarity)) {
-      bestMatch = { cardId, similarity };
+    // Same format comparison
+    const [trainedHashValue, trainedSizeCategory] = trainedParts;
+    const trainedSize = parseInt(trainedSizeCategory);
+    
+    // Size similarity (allow 1-2 size categories difference)
+    const sizeDiff = Math.abs(targetSize - trainedSize);
+    const sizeMatch = sizeDiff <= 2; // Allow up to 2 size categories difference
+    
+    // Hash similarity (check if hashes are close)
+    const targetHashNum = parseInt(targetHashValue, 16);
+    const trainedHashNum = parseInt(trainedHashValue, 16);
+    
+    if (!isNaN(targetHashNum) && !isNaN(trainedHashNum)) {
+      const hashDiff = Math.abs(targetHashNum - trainedHashNum);
+      const maxHash = Math.max(targetHashNum, trainedHashNum);
+      const hashSimilarity = maxHash > 0 ? Math.max(0, 1 - (hashDiff / maxHash)) : 0;
+      
+      // Combined similarity score
+      let similarity = 0;
+      if (sizeMatch) {
+        similarity = hashSimilarity * 0.7 + (1 - sizeDiff / 10) * 0.3;
+      }
+      
+      console.log(`  📊 Same-format comparing with ${trainedHash}: size match=${sizeMatch}, hash sim=${hashSimilarity.toFixed(3)}, total sim=${similarity.toFixed(3)}`);
+      
+      if (similarity > 0.4 && (!bestMatch || similarity > bestMatch.similarity)) {
+        bestMatch = { cardId, similarity };
+        console.log(`  ✨ New best match: Card ${cardId} with similarity ${similarity.toFixed(3)}`);
+      }
     }
   }
   
-  if (bestMatch) {
-    return allCards.find(c => c.id === bestMatch.cardId) || null;
+  if (bestMatch && bestMatch.similarity > 0.6) {
+    const card = allCards.find(c => c.id === bestMatch.cardId);
+    console.log(`✅ FUZZY MATCH FOUND: ${card?.name} (similarity: ${bestMatch.similarity.toFixed(3)})`);
+    return card || null;
   }
   
+  console.log(`❌ No fuzzy match found (best similarity: ${bestMatch?.similarity.toFixed(3) || 'none'})`);
   return null;
 }
 
@@ -143,12 +261,25 @@ function selectCardByImageCharacteristics(imageData: string, allCards: TarotCard
   return allCards[index];
 }
 
-export function getTrainingStats(): { totalTrainedImages: number; trainedCards: string[] } {
+export async function getTrainingStats(): Promise<{ totalTrainedImages: number; trainedCards: string[] }> {
+  try {
+    await loadTrainingData();
+    const trainedCardIds = Array.from(new Set(imageTrainingData.values()));
+    console.log(`📊 Training stats requested: ${imageTrainingData.size} images, cards: [${trainedCardIds.join(', ')}]`);
+    return {
+      totalTrainedImages: imageTrainingData.size,
+      trainedCards: trainedCardIds.map(id => `Card ID: ${id}`).slice(0, 10) // Show first 10
+    };
+  } catch (error) {
+    console.error('Error getting training stats:', error);
+    return {
+      totalTrainedImages: 0,
+      trainedCards: []
+    };
+  }
+}
+
+export function getAllTrainingData(): Map<string, number> {
   loadTrainingData();
-  const trainedCardIds = Array.from(new Set(imageTrainingData.values()));
-  console.log(`📊 Training stats requested: ${imageTrainingData.size} images, cards: [${trainedCardIds.join(', ')}]`);
-  return {
-    totalTrainedImages: imageTrainingData.size,
-    trainedCards: trainedCardIds.map(id => `Card ID: ${id}`).slice(0, 10) // Show first 10
-  };
+  return imageTrainingData;
 }

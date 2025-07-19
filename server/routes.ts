@@ -196,7 +196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Train the new system
-      trainCard(imageData, targetCard);
+      await trainCard(imageData, targetCard);
       
       // Note: Using only the new training system now
       
@@ -214,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get training statistics
   app.get("/api/training-stats", async (req, res) => {
     try {
-      const stats = getTrainingStats();
+      const stats = await getTrainingStats();
       res.json(stats);
     } catch (error) {
       console.error("Error getting training stats:", error);

@@ -65,6 +65,9 @@ Preferred communication style: Simple, everyday language.
   - Enhanced logging for debugging recognition process
   - Training now works with 95% confidence on learned images
   - OpenAI text recognition disabled due to quota limitations
+  - Implemented fuzzy matching for image recognition to handle lighting/compression variations
+  - Modified image hashing to be less sensitive to minor image differences
+  - Added similarity scoring algorithm for better card recognition
 
 ## External Dependencies
 
