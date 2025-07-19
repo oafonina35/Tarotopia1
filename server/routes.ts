@@ -9,6 +9,7 @@ import { enhancedCardRecognition } from "./simple-card-recognition";
 import { recognizeWithTraining, trainCard } from "./manual-training-recognition";
 import { getTrainingStats } from "./manual-training-recognition";
 import { recognizeCardByText } from "./text-recognition";
+import { advancedImageRecognition, RECOGNITION_OPTIONS } from "./advanced-recognition";
 import { z } from "zod";
 
 const cardRecognitionSchema = z.object({
@@ -80,9 +81,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         recognizedCard = textResult.card;
       } else {
-        // Fall back to training-based recognition
-        recognitionResult = await recognizeWithTraining(imageData, allCards);
-        recognizedCard = recognitionResult.card;
+        // Try training-based recognition first
+        const trainingResult = await recognizeWithTraining(imageData, allCards);
+        
+        if (trainingResult.confidence > 0.8) {
+          // High confidence from training
+          recognitionResult = trainingResult;
+          recognizedCard = trainingResult.card;
+        } else {
+          // Use advanced image recognition as fallback
+          const advancedResult = await advancedImageRecognition(imageData, allCards);
+          recognitionResult = {
+            card: advancedResult.card,
+            confidence: advancedResult.confidence,
+            isLearned: advancedResult.isLearned,
+            method: advancedResult.method
+          };
+          recognizedCard = advancedResult.card;
+        }
       }
       
       if (!recognizedCard) {
@@ -241,6 +257,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error in text recognition debug:", error);
       res.status(500).json({ error: "Failed to process text recognition" });
+    }
+  });
+
+  // Get recognition options and pricing
+  app.get("/api/recognition-options", async (req, res) => {
+    try {
+      res.json(RECOGNITION_OPTIONS);
+    } catch (error) {
+      console.error("Error fetching recognition options:", error);
+      res.status(500).json({ error: "Failed to fetch options" });
     }
   });
 
