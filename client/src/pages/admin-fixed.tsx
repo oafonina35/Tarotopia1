@@ -142,18 +142,15 @@ export default function Admin() {
     }
 
     try {
-      // Parse JSON data
       const cardsData = JSON.parse(bulkData);
       
       if (!Array.isArray(cardsData)) {
         throw new Error("Data must be an array of card objects");
       }
 
-      // Process each card
       for (let i = 0; i < cardsData.length; i++) {
         const cardData = cardsData[i];
         
-        // Find matching image file by name
         let imageUrl = null;
         if (bulkImages) {
           const imageFile = Array.from(bulkImages).find(file => 
@@ -195,7 +192,6 @@ export default function Admin() {
         description: `Successfully uploaded ${cardsData.length} cards.`,
       });
 
-      // Clear the form
       setBulkData("");
       setBulkImages(null);
 
@@ -263,87 +259,190 @@ export default function Admin() {
             <TabsContent value="single" className="space-y-6 mt-6">
               {cards.map((card, index) => (
                 <Card key={index} className="card-gradient border border-mystic-purple/30">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-mystic-gold">
-                    Card {index + 1}
-                  </CardTitle>
-                  {cards.length > 1 && (
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="text-mystic-gold">
+                      Card {index + 1}
+                    </CardTitle>
+                    {cards.length > 1 && (
+                      <Button
+                        onClick={() => removeCard(index)}
+                        variant="outline"
+                        size="icon"
+                        className="border-red-500 text-red-500 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-300">Card Name *</label>
+                        <Input
+                          placeholder="e.g., The Fool"
+                          value={card.name}
+                          onChange={(e) => updateCard(index, 'name', e.target.value)}
+                          className="bg-charcoal/50 border-mystic-purple/30 text-gray-200"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium text-gray-300">Arcana *</label>
+                        <Select value={card.arcana} onValueChange={(value: "Major" | "Minor") => updateCard(index, 'arcana', value)}>
+                          <SelectTrigger className="bg-charcoal/50 border-mystic-purple/30 text-gray-200">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Major">Major Arcana</SelectItem>
+                            <SelectItem value="Minor">Minor Arcana</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-300">Number</label>
+                        <Input
+                          type="number"
+                          placeholder="0-21 for Major, 1-14 for Minor"
+                          value={card.number || ""}
+                          onChange={(e) => updateCard(index, 'number', parseInt(e.target.value) || undefined)}
+                          className="bg-charcoal/50 border-mystic-purple/30 text-gray-200"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-300">Suit (Minor Arcana only)</label>
+                        <Input
+                          placeholder="Cups, Wands, Swords, Pentacles"
+                          value={card.suit || ""}
+                          onChange={(e) => updateCard(index, 'suit', e.target.value)}
+                          className="bg-charcoal/50 border-mystic-purple/30 text-gray-200"
+                          disabled={card.arcana === "Major"}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">Card Image</label>
+                      <div className="mt-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => updateCard(index, 'imageFile', e.target.files?.[0])}
+                          className="hidden"
+                          id={`image-${index}`}
+                        />
+                        <label
+                          htmlFor={`image-${index}`}
+                          className="flex items-center justify-center w-full p-4 border-2 border-dashed border-mystic-purple/50 rounded-lg cursor-pointer hover:border-mystic-gold/50 transition-colors"
+                        >
+                          <div className="text-center">
+                            <Upload className="w-8 h-8 text-mystic-gold mx-auto mb-2" />
+                            <p className="text-gray-300 text-sm">
+                              {card.imageFile ? card.imageFile.name : 'Click to upload card image'}
+                            </p>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">Meaning *</label>
+                      <Textarea
+                        placeholder="Describe what this card represents and its general meaning..."
+                        value={card.meaning}
+                        onChange={(e) => updateCard(index, 'meaning', e.target.value)}
+                        className="bg-charcoal/50 border-mystic-purple/30 text-gray-200 min-h-[100px]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">Symbolism *</label>
+                      <Textarea
+                        placeholder="Explain the symbols and imagery on this card..."
+                        value={card.symbolism}
+                        onChange={(e) => updateCard(index, 'symbolism', e.target.value)}
+                        className="bg-charcoal/50 border-mystic-purple/30 text-gray-200 min-h-[100px]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">Guidance *</label>
+                      <Textarea
+                        placeholder="What guidance or advice does this card offer..."
+                        value={card.guidance}
+                        onChange={(e) => updateCard(index, 'guidance', e.target.value)}
+                        className="bg-charcoal/50 border-mystic-purple/30 text-gray-200 min-h-[100px]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">Keywords</label>
+                      <Input
+                        placeholder="love, relationships, choices, harmony (comma-separated)"
+                        value={card.keywords}
+                        onChange={(e) => updateCard(index, 'keywords', e.target.value)}
+                        className="bg-charcoal/50 border-mystic-purple/30 text-gray-200"
+                      />
+                    </div>
+
                     <Button
-                      onClick={() => removeCard(index)}
-                      variant="outline"
-                      size="icon"
-                      className="border-red-500 text-red-500 hover:bg-red-500/10"
+                      onClick={() => handleSubmit(index)}
+                      disabled={createCardMutation.isPending}
+                      className="w-full bg-mystic-gold text-rich-black font-semibold hover:bg-yellow-400"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      {createCardMutation.isPending ? "Adding..." : "Add Card"}
                     </Button>
-                  )}
+                  </CardContent>
+                </Card>
+              ))}
+
+              <div className="text-center">
+                <Button
+                  onClick={addNewCard}
+                  variant="outline"
+                  className="border-mystic-gold text-mystic-gold hover:bg-mystic-gold hover:text-rich-black"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Another Card
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="bulk" className="space-y-6 mt-6">
+              <Card className="card-gradient border border-mystic-purple/30">
+                <CardHeader>
+                  <CardTitle className="text-mystic-gold flex items-center">
+                    <Database className="w-5 h-5 mr-2" />
+                    Bulk Upload Cards
+                  </CardTitle>
+                  <p className="text-gray-400 text-sm">
+                    Upload multiple cards at once using JSON format
+                  </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-300">Card Name *</label>
-                      <Input
-                        placeholder="e.g., The Fool"
-                        value={card.name}
-                        onChange={(e) => updateCard(index, 'name', e.target.value)}
-                        className="bg-charcoal/50 border-mystic-purple/30 text-gray-200"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium text-gray-300">Arcana *</label>
-                      <Select value={card.arcana} onValueChange={(value: "Major" | "Minor") => updateCard(index, 'arcana', value)}>
-                        <SelectTrigger className="bg-charcoal/50 border-mystic-purple/30 text-gray-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Major">Major Arcana</SelectItem>
-                          <SelectItem value="Minor">Minor Arcana</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-gray-300">Number</label>
-                      <Input
-                        type="number"
-                        placeholder="0-21 for Major, 1-14 for Minor"
-                        value={card.number || ""}
-                        onChange={(e) => updateCard(index, 'number', parseInt(e.target.value) || undefined)}
-                        className="bg-charcoal/50 border-mystic-purple/30 text-gray-200"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-gray-300">Suit (Minor Arcana only)</label>
-                      <Input
-                        placeholder="Cups, Wands, Swords, Pentacles"
-                        value={card.suit || ""}
-                        onChange={(e) => updateCard(index, 'suit', e.target.value)}
-                        className="bg-charcoal/50 border-mystic-purple/30 text-gray-200"
-                        disabled={card.arcana === "Major"}
-                      />
-                    </div>
-                  </div>
-
                   <div>
-                    <label className="text-sm font-medium text-gray-300">Card Image</label>
+                    <label className="text-sm font-medium text-gray-300">Card Images (optional)</label>
                     <div className="mt-1">
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => updateCard(index, 'imageFile', e.target.files?.[0])}
+                        multiple
+                        onChange={(e) => setBulkImages(e.target.files)}
                         className="hidden"
-                        id={`image-${index}`}
+                        id="bulk-images"
                       />
                       <label
-                        htmlFor={`image-${index}`}
+                        htmlFor="bulk-images"
                         className="flex items-center justify-center w-full p-4 border-2 border-dashed border-mystic-purple/50 rounded-lg cursor-pointer hover:border-mystic-gold/50 transition-colors"
                       >
                         <div className="text-center">
                           <Upload className="w-8 h-8 text-mystic-gold mx-auto mb-2" />
                           <p className="text-gray-300 text-sm">
-                            {card.imageFile ? card.imageFile.name : 'Click to upload card image'}
+                            {bulkImages ? `${bulkImages.length} images selected` : 'Click to upload card images'}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-1">
+                            Images will be matched by card name
                           </p>
                         </div>
                       </label>
@@ -351,67 +450,40 @@ export default function Admin() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-gray-300">Meaning *</label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-medium text-gray-300">Card Data (JSON Format)</label>
+                      <Button
+                        onClick={generateSampleData}
+                        variant="outline"
+                        size="sm"
+                        className="border-mystic-purple text-mystic-gold hover:bg-mystic-purple/20"
+                      >
+                        <FileText className="w-4 h-4 mr-1" />
+                        Load Sample
+                      </Button>
+                    </div>
                     <Textarea
-                      placeholder="Describe what this card represents and its general meaning..."
-                      value={card.meaning}
-                      onChange={(e) => updateCard(index, 'meaning', e.target.value)}
-                      className="bg-charcoal/50 border-mystic-purple/30 text-gray-200 min-h-[100px]"
+                      placeholder="Paste JSON array of card objects here..."
+                      value={bulkData}
+                      onChange={(e) => setBulkData(e.target.value)}
+                      className="bg-charcoal/50 border-mystic-purple/30 text-gray-200 min-h-[300px] font-mono text-sm"
                     />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-300">Symbolism *</label>
-                    <Textarea
-                      placeholder="Explain the symbols and imagery on this card..."
-                      value={card.symbolism}
-                      onChange={(e) => updateCard(index, 'symbolism', e.target.value)}
-                      className="bg-charcoal/50 border-mystic-purple/30 text-gray-200 min-h-[100px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-300">Guidance *</label>
-                    <Textarea
-                      placeholder="What guidance or advice does this card offer..."
-                      value={card.guidance}
-                      onChange={(e) => updateCard(index, 'guidance', e.target.value)}
-                      className="bg-charcoal/50 border-mystic-purple/30 text-gray-200 min-h-[100px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-300">Keywords</label>
-                    <Input
-                      placeholder="love, relationships, choices, harmony (comma-separated)"
-                      value={card.keywords}
-                      onChange={(e) => updateCard(index, 'keywords', e.target.value)}
-                      className="bg-charcoal/50 border-mystic-purple/30 text-gray-200"
-                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Required fields: name, meaning, symbolism, guidance. Optional: arcana, number, suit, keywords
+                    </p>
                   </div>
 
                   <Button
-                    onClick={() => handleSubmit(index)}
-                    disabled={createCardMutation.isPending}
+                    onClick={handleBulkUpload}
+                    disabled={createCardMutation.isPending || !bulkData.trim()}
                     className="w-full bg-mystic-gold text-rich-black font-semibold hover:bg-yellow-400"
                   >
-                    {createCardMutation.isPending ? "Adding..." : "Add Card"}
+                    {createCardMutation.isPending ? "Uploading..." : "Upload All Cards"}
                   </Button>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-
-          <div className="mt-6 text-center">
-            <Button
-              onClick={addNewCard}
-              variant="outline"
-              className="border-mystic-gold text-mystic-gold hover:bg-mystic-gold hover:text-rich-black"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Another Card
-            </Button>
-          </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>
