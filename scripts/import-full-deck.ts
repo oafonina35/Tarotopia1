@@ -110,7 +110,7 @@ async function parseAndImportCards() {
         arcana: arcana,
         number: arcana === 'Major' ? number : null,
         suit: suit,
-        meaning: description.slice(0, 500) + (description.length > 500 ? '...' : ''),
+        meaning: description,
         symbolism: subtitle || 'Sensual exploration and passionate connection',
         guidance: sensualSuggestions || description.slice(-200),
         keywords: keywords.slice(0, 5),
