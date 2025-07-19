@@ -67,7 +67,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
       <div className="space-y-4">
         <div>
           <h4 className="text-lg font-serif font-semibold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>Meaning</h4>
-          <p className="text-foreground/90 text-sm leading-relaxed">
+          <p className="text-foreground/90 text-sm leading-relaxed whitespace-pre-line">
             {card.meaning}
           </p>
         </div>
