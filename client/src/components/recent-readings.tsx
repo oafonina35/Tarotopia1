@@ -115,10 +115,10 @@ export default function RecentReadings() {
               
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium text-card-foreground truncate">{reading.cardName}</h4>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs mt-1" style={{ color: 'hsl(180, 40%, 30%)' }}>
                   {formatTimeAgo(reading.timestamp)}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1 truncate">
+                <p className="text-xs mt-1 truncate" style={{ color: 'hsl(180, 35%, 25%)' }}>
                   {getShortMeaning(reading.cardName)}
                 </p>
               </div>
