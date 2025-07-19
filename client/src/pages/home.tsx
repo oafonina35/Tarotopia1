@@ -108,7 +108,7 @@ export default function Home() {
               <Button
                 onClick={() => setShowManualSelector(true)}
                 variant="outline"
-                className="border-primary/30 text-primary hover:bg-primary/10"
+                className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white"
               >
                 <BookOpen className="w-4 h-4 mr-2" />
                 Choose Card Manually
