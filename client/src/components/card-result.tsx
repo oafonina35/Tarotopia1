@@ -77,7 +77,7 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
         <div>
           <h4 className="text-lg font-serif font-semibold text-mystic-gold mb-2">Sensual Suggestions</h4>
           <div className="text-gray-300 text-sm leading-relaxed">
-            {card.guidance && card.guidance.split(' – ').map((suggestion, index) => (
+            {card.guidance && card.guidance.split('\n').map((suggestion, index) => (
               <div key={index} className="flex items-start mb-2">
                 <span className="text-mystic-gold mr-2 mt-1">•</span>
                 <span>{suggestion.trim()}</span>
