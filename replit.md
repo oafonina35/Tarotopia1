@@ -7,6 +7,7 @@ Mystic Scanner is a web application that allows users to scan and identify tarot
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Manual card selection: Keep "Choose Card Manually" button permanently visible for easy deck browsing.
 
 ## System Architecture
 
@@ -67,6 +68,8 @@ Preferred communication style: Simple, everyday language.
   - User confirmed preference for flat-fee options over pay-per-use
   - OpenAI Vision available but user has quota limits on current plan
   - Free OCR provides unlimited text recognition without any subscription costs
+  - Fixed major card image mismatches (Aces, Wands suit 5-10, 9 of Cups)
+  - Added permanent manual card selection button for easy deck browsing
 
 ## External Dependencies
 
