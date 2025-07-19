@@ -50,19 +50,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { imageData } = result.data;
       
-      // Simplified card recognition - in real implementation, this would use
-      // computer vision/ML models to analyze the image
-      // For now, we'll simulate recognition by returning a random Major Arcana card
+      // Enhanced card recognition simulation that uses your complete custom deck
       const allCards = await storage.getAllTarotCards();
-      const majorArcanaCards = allCards.filter(card => card.arcana === "Major");
       
-      if (majorArcanaCards.length === 0) {
+      if (allCards.length === 0) {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Simulate recognition (in production, replace with actual image analysis)
-      const randomIndex = Math.floor(Math.random() * majorArcanaCards.length);
-      const recognizedCard = majorArcanaCards[randomIndex];
+      // Simulate recognition from your complete 78-card custom deck
+      // This randomly selects from all cards (Major + Minor Arcana) to demonstrate
+      // your custom descriptions and artwork
+      const randomIndex = Math.floor(Math.random() * allCards.length);
+      const recognizedCard = allCards[randomIndex];
       
       // Create a reading record
       const reading = await storage.createCardReading({
