@@ -243,8 +243,10 @@ export class MemStorage implements IStorage {
       const card: TarotCard = {
         id: this.currentCardId++,
         ...cardData,
+        number: cardData.number ?? null,
         suit: null,
-        imageUrl: null
+        imageUrl: null,
+        keywords: cardData.keywords ?? null
       };
       this.tarotCards.set(card.id, card);
     });
@@ -283,7 +285,14 @@ export class MemStorage implements IStorage {
 
   async createTarotCard(insertCard: InsertTarotCard): Promise<TarotCard> {
     const id = this.currentCardId++;
-    const card: TarotCard = { ...insertCard, id };
+    const card: TarotCard = { 
+      ...insertCard, 
+      id,
+      number: insertCard.number ?? null,
+      suit: insertCard.suit ?? null,
+      imageUrl: insertCard.imageUrl ?? null,
+      keywords: insertCard.keywords ?? null
+    };
     this.tarotCards.set(id, card);
     return card;
   }
@@ -302,7 +311,9 @@ export class MemStorage implements IStorage {
     const id = this.currentReadingId++;
     const reading: CardReading = { 
       ...insertReading, 
-      id, 
+      id,
+      cardId: insertReading.cardId ?? null,
+      imageData: insertReading.imageData ?? null,
       timestamp: new Date() 
     };
     this.cardReadings.set(id, reading);

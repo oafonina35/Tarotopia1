@@ -130,6 +130,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new tarot card
+  app.post("/api/cards", async (req, res) => {
+    try {
+      const result = insertTarotCardSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: result.error.errors });
+      }
+
+      const card = await storage.createTarotCard(result.data);
+      res.status(201).json(card);
+    } catch (error) {
+      console.error("Error creating card:", error);
+      res.status(500).json({ error: "Failed to create card" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
