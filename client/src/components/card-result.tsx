@@ -27,14 +27,37 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
         </p>
       </div>
 
-      {/* Card Image Placeholder */}
+      {/* Card Image */}
       <div className="mb-6 flex justify-center">
-        <div className="w-32 h-48 bg-gradient-to-br from-mystic-purple to-cosmic-blue rounded-lg shadow-lg border border-mystic-gold/30 flex items-center justify-center">
-          <div className="text-center">
-            <Star className="w-8 h-8 text-mystic-gold mx-auto mb-2" fill="currentColor" />
-            <p className="text-mystic-gold text-xs font-medium">{card.name}</p>
+        {card.imageUrl ? (
+          <div className="relative w-32 h-48 rounded-lg shadow-lg border border-mystic-gold/30 overflow-hidden">
+            <img 
+              src={card.imageUrl.replace('@assets/', '/attached_assets/')}
+              alt={card.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to placeholder if image fails to load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.parentElement!.innerHTML = `
+                  <div class="w-full h-full bg-gradient-to-br from-mystic-purple to-cosmic-blue flex items-center justify-center">
+                    <div class="text-center">
+                      <div class="w-8 h-8 mx-auto mb-2 text-mystic-gold">★</div>
+                      <p class="text-mystic-gold text-xs font-medium">${card.name}</p>
+                    </div>
+                  </div>
+                `;
+              }}
+            />
           </div>
-        </div>
+        ) : (
+          <div className="w-32 h-48 bg-gradient-to-br from-mystic-purple to-cosmic-blue rounded-lg shadow-lg border border-mystic-gold/30 flex items-center justify-center">
+            <div className="text-center">
+              <Star className="w-8 h-8 text-mystic-gold mx-auto mb-2" fill="currentColor" />
+              <p className="text-mystic-gold text-xs font-medium">{card.name}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Card Description */}
