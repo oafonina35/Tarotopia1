@@ -95,9 +95,7 @@ export default function DailyCard() {
             <CardDescription className="text-lg">
               {formatDate()}
             </CardDescription>
-            <p className="text-sm text-slate-600 mt-2">
-              Receive guidance and insight for your day ahead
-            </p>
+
           </CardHeader>
           
           <CardContent className="space-y-6">
