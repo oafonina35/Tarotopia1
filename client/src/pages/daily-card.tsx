@@ -137,8 +137,6 @@ export default function DailyCard() {
             ) : (
               <div className="space-y-6">
                 <div className="text-center space-y-6">
-                  <h3 className="text-xl font-semibold text-teal-700">Your Card for Today</h3>
-                  
                   {currentCard.imageUrl && (
                     <div className="w-48 h-72 mx-auto rounded-lg border-2 border-teal-200 overflow-hidden shadow-lg">
                       <img
