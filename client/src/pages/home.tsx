@@ -96,7 +96,7 @@ export default function Home() {
           
           {/* Welcome Section */}
           {scanningState === 'ready' && (
-            <div className="text-center mb-8">
+            <div className="text-center mb-8 -mt-4">
               <h2 className="text-2xl font-serif font-bold mb-2" style={{ color: 'hsl(180, 45%, 35%)' }}>Discover Your Path</h2>
               <p className="text-sm text-foreground mb-6 max-w-64 mx-auto">Scan any tarot card to reveal its mystical meanings and guidance</p>
             </div>
