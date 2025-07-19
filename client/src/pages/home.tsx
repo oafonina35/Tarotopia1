@@ -2,8 +2,9 @@ import { useState } from "react";
 import CameraScanner from "@/components/camera-scanner";
 import CardResult from "@/components/card-result";
 import RecentReadings from "@/components/recent-readings";
+import ManualCardSelector from "@/components/manual-card-selector";
 import { Button } from "@/components/ui/button";
-import { Star, Menu } from "lucide-react";
+import { Star, Menu, BookOpen } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
 
 type ScanningState = 'ready' | 'scanning' | 'processing' | 'result' | 'error';
@@ -13,6 +14,7 @@ export default function Home() {
   const [recognizedCard, setRecognizedCard] = useState<TarotCard | null>(null);
   const [currentReading, setCurrentReading] = useState<CardReading | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [showManualSelector, setShowManualSelector] = useState<boolean>(false);
 
   const handleScanComplete = (card: TarotCard, reading: CardReading) => {
     setRecognizedCard(card);
@@ -29,12 +31,20 @@ export default function Home() {
     setRecognizedCard(null);
     setCurrentReading(null);
     setErrorMessage('');
+    setShowManualSelector(false);
     setScanningState('ready');
   };
 
   const handleTryAgain = () => {
     setErrorMessage('');
     setScanningState('ready');
+  };
+
+  const handleManualCardSelected = (card: TarotCard, reading: CardReading) => {
+    setRecognizedCard(card);
+    setCurrentReading(reading);
+    setShowManualSelector(false);
+    setScanningState('result');
   };
 
   return (
@@ -78,13 +88,37 @@ export default function Home() {
             </div>
           )}
 
+          {/* Browse Deck Button */}
+          {scanningState === 'ready' && !showManualSelector && (
+            <div className="text-center mb-6">
+              <Button
+                onClick={() => setShowManualSelector(true)}
+                variant="outline"
+                className="border-mystic-gold/30 text-mystic-gold hover:bg-mystic-gold/10"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Browse Your Custom Deck
+              </Button>
+            </div>
+          )}
+
+          {/* Manual Card Selector */}
+          {showManualSelector && (
+            <ManualCardSelector
+              onCardSelected={handleManualCardSelected}
+              onClose={() => setShowManualSelector(false)}
+            />
+          )}
+
           {/* Scanning Interface */}
-          <CameraScanner
-            scanningState={scanningState}
-            setScanningState={setScanningState}
-            onScanComplete={handleScanComplete}
-            onScanError={handleScanError}
-          />
+          {!showManualSelector && (
+            <CameraScanner
+              scanningState={scanningState}
+              setScanningState={setScanningState}
+              onScanComplete={handleScanComplete}
+              onScanError={handleScanError}
+            />
+          )}
 
           {/* Card Result */}
           {scanningState === 'result' && recognizedCard && (
