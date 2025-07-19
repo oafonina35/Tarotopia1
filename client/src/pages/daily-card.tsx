@@ -167,9 +167,13 @@ export default function DailyCard() {
                     {currentCard.meaning && (
                       <div className="text-left max-w-2xl mx-auto">
                         <h5 className="font-semibold text-teal-600 mb-2">Today's Message:</h5>
-                        <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
-                          {currentCard.meaning}
-                        </p>
+                        <div className="text-sm text-slate-600 leading-relaxed">
+                          {currentCard.meaning.split('\n\n').map((paragraph, index) => (
+                            <p key={index} className="mb-3 last:mb-0">
+                              {paragraph.trim()}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                     )}
                     
