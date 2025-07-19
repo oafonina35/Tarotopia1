@@ -23,6 +23,13 @@ export const cardReadings = pgTable("card_readings", {
   imageData: text("image_data"), // Base64 encoded image
 });
 
+export const trainingData = pgTable("training_data", {
+  id: serial("id").primaryKey(),
+  imageHash: text("image_hash").notNull().unique(),
+  cardId: integer("card_id").notNull().references(() => tarotCards.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertTarotCardSchema = createInsertSchema(tarotCards).omit({
   id: true,
 });
@@ -32,10 +39,17 @@ export const insertCardReadingSchema = createInsertSchema(cardReadings).omit({
   timestamp: true,
 });
 
+export const insertTrainingDataSchema = createInsertSchema(trainingData).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertTarotCard = z.infer<typeof insertTarotCardSchema>;
 export type TarotCard = typeof tarotCards.$inferSelect;
 export type InsertCardReading = z.infer<typeof insertCardReadingSchema>;
 export type CardReading = typeof cardReadings.$inferSelect;
+export type InsertTrainingData = z.infer<typeof insertTrainingDataSchema>;
+export type TrainingData = typeof trainingData.$inferSelect;
 
 // Keep existing users table
 export const users = pgTable("users", {
