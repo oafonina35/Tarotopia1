@@ -19,18 +19,24 @@ export default function ManualCardSelector({ onCardSelected, onClose }: ManualCa
   });
 
   const createReadingMutation = useMutation({
-    mutationFn: async (cardId: number) => {
-      const response = await fetch("/api/recognize-card", {
+    mutationFn: async (card: TarotCard) => {
+      // Create reading directly for the selected card
+      const response = await fetch("/api/readings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageData: `manual_selection_${cardId}_${Date.now()}` }),
+        body: JSON.stringify({
+          cardId: card.id,
+          cardName: card.name,
+          imageData: `manual_selection_${card.id}_${Date.now()}`,
+        }),
       });
       
       if (!response.ok) {
         throw new Error("Failed to create reading");
       }
       
-      return response.json();
+      const reading = await response.json();
+      return { card, reading };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/readings"] });
@@ -45,7 +51,7 @@ export default function ManualCardSelector({ onCardSelected, onClose }: ManualCa
   );
 
   const handleCardSelect = (card: TarotCard) => {
-    createReadingMutation.mutate(card.id);
+    createReadingMutation.mutate(card);
   };
 
   return (
