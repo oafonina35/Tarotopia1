@@ -65,40 +65,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Try text recognition first
-      const textResult = await recognizeCardByText(imageData, allCards);
+      // Use training-based recognition first (most reliable)
+      const trainingResult = await recognizeWithTraining(imageData, allCards);
       
       let recognitionResult;
       let recognizedCard;
       
-      if (textResult.card && textResult.confidence > 0.7) {
-        // High confidence text recognition
-        recognitionResult = {
-          card: textResult.card,
-          confidence: textResult.confidence,
-          isLearned: false,
-          method: 'text-recognition'
-        };
-        recognizedCard = textResult.card;
+      if (trainingResult.confidence > 0.8) {
+        // High confidence from training
+        recognitionResult = trainingResult;
+        recognizedCard = trainingResult.card;
       } else {
-        // Try training-based recognition first
-        const trainingResult = await recognizeWithTraining(imageData, allCards);
-        
-        if (trainingResult.confidence > 0.8) {
-          // High confidence from training
-          recognitionResult = trainingResult;
-          recognizedCard = trainingResult.card;
-        } else {
-          // Use advanced image recognition as fallback
-          const advancedResult = await advancedImageRecognition(imageData, allCards);
-          recognitionResult = {
-            card: advancedResult.card,
-            confidence: advancedResult.confidence,
-            isLearned: advancedResult.isLearned,
-            method: advancedResult.method
-          };
-          recognizedCard = advancedResult.card;
-        }
+        // Use advanced image recognition as fallback
+        const advancedResult = await advancedImageRecognition(imageData, allCards);
+        recognitionResult = {
+          card: advancedResult.card,
+          confidence: Math.max(advancedResult.confidence, trainingResult.confidence),
+          isLearned: advancedResult.isLearned,
+          method: trainingResult.confidence > advancedResult.confidence ? 'pattern-based' : advancedResult.method
+        };
+        recognizedCard = trainingResult.confidence > advancedResult.confidence ? trainingResult.card : advancedResult.card;
       }
       
       if (!recognizedCard) {
