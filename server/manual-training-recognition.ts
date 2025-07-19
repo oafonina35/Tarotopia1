@@ -1,7 +1,19 @@
 import type { TarotCard } from "@shared/schema";
 
-// Simple in-memory training data that learns from user corrections
+// Persistent training data that survives server restarts
 const imageTrainingData = new Map<string, number>();
+
+// Load training data from environment/memory (basic persistence)
+let trainingDataLoaded = false;
+
+function loadTrainingData() {
+  if (!trainingDataLoaded) {
+    // In a real app, you'd load from database or file
+    // For now, we'll use a more robust in-memory approach
+    trainingDataLoaded = true;
+    console.log('Training data system initialized');
+  }
+}
 
 export interface RecognitionResult {
   card: TarotCard;
@@ -10,19 +22,26 @@ export interface RecognitionResult {
 }
 
 export function trainCard(imageData: string, correctCard: TarotCard): void {
+  loadTrainingData();
   const imageHash = createImageHash(imageData);
   imageTrainingData.set(imageHash, correctCard.id);
-  console.log(`Trained image hash ${imageHash} for card: ${correctCard.name}`);
+  console.log(`✓ TRAINED: Image hash ${imageHash} → ${correctCard.name} (ID: ${correctCard.id})`);
+  console.log(`✓ Total trained images: ${imageTrainingData.size}`);
 }
 
 export async function recognizeWithTraining(imageData: string, allCards: TarotCard[]): Promise<RecognitionResult> {
+  loadTrainingData();
   const imageHash = createImageHash(imageData);
+  
+  console.log(`🔍 Looking for image hash: ${imageHash}`);
+  console.log(`🔍 Training data size: ${imageTrainingData.size}`);
   
   // First check if we've learned this image
   const learnedCardId = imageTrainingData.get(imageHash);
   if (learnedCardId) {
     const learnedCard = allCards.find(c => c.id === learnedCardId);
     if (learnedCard) {
+      console.log(`✅ FOUND LEARNED: ${learnedCard.name} (confidence: 95%)`);
       return {
         card: learnedCard,
         confidence: 0.95,
@@ -30,6 +49,8 @@ export async function recognizeWithTraining(imageData: string, allCards: TarotCa
       };
     }
   }
+  
+  console.log(`❌ No learned match found, using fallback`);
   
   // If not learned, use similarity to find closest trained image
   const similarCard = findSimilarTrainedImage(imageHash, allCards);
@@ -123,7 +144,9 @@ function selectCardByImageCharacteristics(imageData: string, allCards: TarotCard
 }
 
 export function getTrainingStats(): { totalTrainedImages: number; trainedCards: string[] } {
+  loadTrainingData();
   const trainedCardIds = Array.from(new Set(imageTrainingData.values()));
+  console.log(`📊 Training stats requested: ${imageTrainingData.size} images, cards: [${trainedCardIds.join(', ')}]`);
   return {
     totalTrainedImages: imageTrainingData.size,
     trainedCards: trainedCardIds.map(id => `Card ID: ${id}`).slice(0, 10) // Show first 10

@@ -36,19 +36,24 @@ export function TrainingInterface({
   // Training mutation
   const trainMutation = useMutation({
     mutationFn: async ({ imageData, cardId }: { imageData: string; cardId: number }) => {
-      return apiRequest('/api/train-card', {
-        method: 'POST',
-        body: { imageData, cardId }
-      });
+      try {
+        const response = await apiRequest('POST', '/api/train-card', { imageData, cardId });
+        return await response.json();
+      } catch (error) {
+        console.error('Training API error:', error);
+        throw error;
+      }
     },
     onSuccess: (data: any) => {
+      console.log('Training success:', data);
       toast({
         title: "Training Successful",
-        description: `Scanner learned: ${data.cardName}`,
+        description: `Scanner learned: ${data.cardName || 'Unknown card'}`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/training-stats'] });
     },
     onError: (error: any) => {
+      console.error('Training mutation error:', error);
       toast({
         title: "Training Failed",
         description: error.message || "Could not train the scanner",
