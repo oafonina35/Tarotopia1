@@ -9,6 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { TarotCard, CardReading } from "@shared/schema";
 import tarotopiaLogo from "@assets/Tarotopia-01_1752963540547.png";
+import cardBackImage from "@assets/70x120 mm, cover_1752965274499.jpg";
 
 export default function DailyCard() {
   const [currentCard, setCurrentCard] = useState<TarotCard | null>(null);
@@ -102,8 +103,12 @@ export default function DailyCard() {
           <CardContent className="space-y-6">
             {!currentCard ? (
               <div className="text-center space-y-6">
-                <div className="w-32 h-48 mx-auto bg-gradient-to-br from-purple-200 to-blue-200 rounded-lg border-2 border-dashed border-purple-300 flex items-center justify-center">
-                  <Star className="h-12 w-12 text-purple-400" />
+                <div className="w-32 h-48 mx-auto rounded-lg overflow-hidden border-2 border-purple-300 shadow-lg">
+                  <img
+                    src={cardBackImage}
+                    alt="Mystical Card Back"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 
                 <div className="space-y-4">
