@@ -59,19 +59,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Try OCR first if available, then fall back to improved recognition
-      let recognizedCard = await recognizeCardByText(imageData, allCards);
+      // Use consistent image-based recognition (OCR disabled due to quota limits)
+      const recognizedCard = await recognizeCardBySimpleMatch(imageData, allCards);
       
-      // If OCR fails, use improved image-based selection
       if (!recognizedCard) {
-        console.log("Using improved image-based recognition");
-        recognizedCard = await recognizeCardBySimpleMatch(imageData, allCards);
-      }
-      
-      // Final fallback to ensure we always return a card
-      if (!recognizedCard) {
-        console.log("Using final fallback selection");
-        recognizedCard = allCards[0];
+        return res.status(500).json({ error: "Failed to process image" });
       }
       
       // Create a reading record
@@ -81,11 +73,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         imageData: imageData,
       });
 
-      // Calculate confidence based on recognition method
-      const wasOCRMatch = await recognizeCardByText(imageData, allCards) !== null;
-      const confidence = wasOCRMatch ? 
-        Math.random() * 0.2 + 0.8 : // 80-100% confidence for OCR matches
-        Math.random() * 0.3 + 0.5;  // 50-80% confidence for fallback matches
+      // Calculate confidence for image-based recognition
+      const confidence = Math.random() * 0.3 + 0.6; // 60-90% confidence for image-based matches
 
       res.json({
         card: recognizedCard,
