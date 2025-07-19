@@ -77,13 +77,12 @@ export default function Home() {
       {/* Header */}
       <header className="relative z-10 px-4 py-6">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex-1 flex justify-center">
             <img 
               src={tarotopiaLogo} 
               alt="Tarotopia Logo" 
-              className="w-12 h-12 object-contain"
+              className="w-36 h-36 object-contain"
             />
-            <h1 className="text-xl font-serif font-semibold text-black">Tarotopia</h1>
           </div>
           <Button variant="ghost" size="icon" className="text-foreground hover:bg-accent/50">
             <Menu className="w-6 h-6" />
