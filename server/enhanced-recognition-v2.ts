@@ -3,6 +3,7 @@ import { recognizeWithTraining } from "./manual-training-recognition";
 import { recognizeWithTesseract } from "./unlimited-ocr";
 import { recognizeWithFreeOCR } from "./free-ocr-recognition";
 import { findBestCardMatch } from "./enhanced-card-matching";
+import { improvedCardMatching } from "./improved-text-recognition";
 
 export interface EnhancedRecognitionResult {
   card: TarotCard | null;
@@ -105,18 +106,39 @@ export async function enhancedRecognitionV2(
     }
   }
 
-  // Layer 3: Advanced Text Pattern Recognition
-  console.log('🔍 Layer 3: Advanced pattern recognition...');
+  // Layer 3: Enhanced Text Pattern Recognition
+  console.log('🔍 Layer 3: Enhanced text pattern recognition...');
   try {
-    // Extract text from the best OCR result
-    const bestOCRText = fallbackResults
-      .filter(r => r.extractedText && r.extractedText !== 'failed')
-      .sort((a, b) => b.confidence - a.confidence)[0]?.extractedText || '';
+    // Collect all extracted text for analysis
+    const allExtractedTexts = fallbackResults
+      .filter(r => r.extractedText && r.extractedText !== 'failed' && r.extractedText.trim().length > 1)
+      .map(r => r.extractedText)
+      .filter(Boolean);
     
+    console.log('📝 All extracted texts:', allExtractedTexts);
+    
+    // Try improved matching on each text
+    for (const text of allExtractedTexts) {
+      const improvedResult = improvedCardMatching(text, allCards);
+      if (improvedResult && improvedResult.confidence > 0.6) {
+        console.log(`✅ IMPROVED PATTERN MATCH: ${improvedResult.card.name} (${improvedResult.confidence})`);
+        return {
+          card: improvedResult.card,
+          confidence: improvedResult.confidence,
+          isLearned: false,
+          method: 'improved-pattern',
+          extractedText: text,
+          fallbackResults
+        };
+      }
+    }
+    
+    // Also try the original advanced pattern matching
+    const bestOCRText = allExtractedTexts[0];
     if (bestOCRText) {
       const patternResult = advancedPatternMatching(bestOCRText, allCards);
-      if (patternResult && patternResult.confidence > 0.6) {
-        console.log(`✅ PATTERN MATCH: ${patternResult.card.name} (${patternResult.confidence})`);
+      if (patternResult && patternResult.confidence > 0.5) {
+        console.log(`✅ ADVANCED PATTERN MATCH: ${patternResult.card.name} (${patternResult.confidence})`);
         return {
           card: patternResult.card,
           confidence: patternResult.confidence,
@@ -134,7 +156,7 @@ export async function enhancedRecognitionV2(
   // Layer 4: Ensemble Method (Combine multiple low-confidence results)
   console.log('🔍 Layer 4: Ensemble method analysis...');
   const ensembleResult = calculateEnsembleMatch(fallbackResults, allCards);
-  if (ensembleResult && ensembleResult.confidence > 0.5) {
+  if (ensembleResult && ensembleResult.confidence > 0.4) {
     console.log(`✅ ENSEMBLE MATCH: ${ensembleResult.card.name} (${ensembleResult.confidence})`);
     return {
       card: ensembleResult.card,
@@ -172,11 +194,11 @@ export async function enhancedRecognitionV2(
   const totalTime = Date.now() - startTime;
   console.log(`⏱️ Total recognition time: ${totalTime}ms`);
   
-  if (bestFallback) {
+  if (bestFallback && bestFallback.confidence > 0.3) {
     console.log(`🎯 BEST FALLBACK: ${bestFallback.card?.name || 'None'} (${bestFallback.confidence})`);
     return {
       card: bestFallback.card || null,
-      confidence: bestFallback.confidence,
+      confidence: Math.min(bestFallback.confidence, 0.6), // Cap fallback confidence
       isLearned: false,
       method: `fallback-${bestFallback.method}`,
       extractedText: bestFallback.extractedText || 'Fallback match',

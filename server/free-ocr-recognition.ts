@@ -38,15 +38,16 @@ export async function recognizeWithFreeOCR(imageData: string, allCards: TarotCar
     // Convert base64 to buffer for OCR.space
     const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
     
-    // Use direct base64 upload to OCR.space API
+    // Use direct base64 upload to OCR.space API with proper format
     const requestBody = {
-      base64Image: `data:image/png;base64,${base64Data}`,
+      base64Image: imageData, // Use full data URL format
       apikey: 'helloworld', // Free API key - no registration needed
       language: 'eng',
       isOverlayRequired: false,
       detectOrientation: true,
       scale: true,
-      OCREngine: 2 // Use newer engine
+      OCREngine: 2, // Use newer engine
+      filetype: 'PNG' // Explicitly specify file type
     };
     
     const response = await fetch('https://api.ocr.space/parse/image', {

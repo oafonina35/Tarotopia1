@@ -24,9 +24,9 @@ export async function recognizeWithTesseract(imageData: string, allCards: TarotC
     
     // Configure for better card text recognition
     await worker.setParameters({
-      tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .',
-      tessedit_pageseg_mode: '8', // Single word
-      tessedit_ocr_engine_mode: '1' // Neural nets LSTM only
+      tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .-',
+      tessedit_pageseg_mode: '6', // Uniform block of text
+      preserve_interword_spaces: '1'
     });
     
     // Perform OCR
