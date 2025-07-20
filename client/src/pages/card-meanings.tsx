@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import NavigationMenu from "@/components/navigation-menu";
+import NavigationMenuV2 from "@/components/navigation-menu-v2";
 import { Search } from "lucide-react";
 import type { TarotCard } from "@shared/schema";
 import tarotopiaLogo from "@assets/Tarotopia-01_1752986772341.png";
@@ -60,7 +60,7 @@ export default function CardMeanings() {
       {/* Header */}
       <header className="relative z-10 px-4 py-6">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <NavigationMenu />
+          <NavigationMenuV2 />
           <div className="flex-1 flex justify-center">
             <img 
               src={tarotopiaLogo} 
