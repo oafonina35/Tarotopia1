@@ -2,6 +2,7 @@ import type { TarotCard } from "@shared/schema";
 import { db } from "./db";
 import { tarotCards } from "@shared/schema";
 import { visualCardRecognition } from "./visual-card-recognition";
+import { googleVisionRecognition } from "./google-vision-recognition";
 
 interface RobustRecognitionResult {
   card: TarotCard;
@@ -27,19 +28,22 @@ export async function robustCardRecognition(imageData: string): Promise<RobustRe
     return trainingResult;
   }
 
-  // Strategy 2: Advanced Visual Recognition (Color + OpenAI Vision)
+  // Strategy 2: Google Vision API for text recognition
+  const googleResult = await googleVisionRecognition(imageData, allCards);
+  if (googleResult && googleResult.confidence > 0.8) {
+    console.log(`✅ GOOGLE VISION MATCH: ${googleResult.card.name} (${googleResult.confidence})`);
+    return googleResult;
+  }
+
+  // Strategy 3: Advanced Visual Recognition (Color Analysis)
   const visualResult = await visualCardRecognition(imageData, allCards);
   if (visualResult && visualResult.confidence > 0.6) {
     console.log(`✅ VISUAL RECOGNITION MATCH: ${visualResult.card.name} (${visualResult.confidence})`);
     return visualResult;
   }
 
-  // Strategy 3: Enhanced Tesseract OCR (disabled due to stability issues)
-  // const tesseractResult = await enhancedTesseractOCR(imageData, allCards);
-  console.log('⚠️ Tesseract OCR skipped for stability');
-
   // Strategy 4: Combination approach with weighted scoring
-  const combinedResult = await combinedRecognitionApproach([trainingResult, visualResult]);
+  const combinedResult = await combinedRecognitionApproach([trainingResult, googleResult, visualResult]);
   if (combinedResult && combinedResult.confidence > 0.5) {
     console.log(`✅ COMBINED MATCH: ${combinedResult.card.name} (${combinedResult.confidence})`);
     return combinedResult;
@@ -273,8 +277,10 @@ async function combinedRecognitionApproach(results: (RobustRecognitionResult | n
   // Weight results by method reliability
   const methodWeights: Record<string, number> = {
     'training': 1.0,
-    'enhanced-tesseract': 0.8,
-    'visual-pattern': 0.6
+    'google-vision': 0.9,
+    'color-analysis': 0.7,
+    'visual-pattern': 0.6,
+    'openai-vision': 0.8
   };
   
   const cardScores: Record<string, { card: TarotCard; totalScore: number; count: number }> = {};
