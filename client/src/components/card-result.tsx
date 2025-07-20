@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Star, Heart, RefreshCw } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
-import RecognitionDetails from "./recognition-details";
 
 interface CardResultProps {
   card: TarotCard;
@@ -10,21 +9,8 @@ interface CardResultProps {
   scanData?: {
     imageData: string;
     confidence: number;
-    isLearned: boolean;
     method: string;
     extractedText?: string;
-    colorScheme?: {
-      dominant: string;
-      secondary: string;
-      accent: string;
-      brightness: number;
-    };
-    fallbackResults?: Array<{
-      method: string;
-      card?: TarotCard;
-      confidence: number;
-      extractedText?: string;
-    }>;
   };
 }
 
@@ -117,14 +103,24 @@ export default function CardResult({ card, reading, onScanAnother, scanData }: C
 
       {/* Recognition Details */}
       {scanData && (
-        <RecognitionDetails
-          confidence={scanData.confidence}
-          method={scanData.method}
-          isLearned={scanData.isLearned}
-          extractedText={scanData.extractedText}
-          fallbackResults={scanData.fallbackResults}
-          colorScheme={scanData.colorScheme}
-        />
+        <div className="mt-4 p-4 bg-accent/10 rounded-lg border border-accent/20">
+          <div className="text-sm text-gray-400">
+            <div className="flex justify-between items-center mb-2">
+              <span>Recognition Method:</span>
+              <span className="text-primary font-medium">{scanData.method}</span>
+            </div>
+            <div className="flex justify-between items-center mb-2">
+              <span>Confidence:</span>
+              <span className="text-primary font-medium">{(scanData.confidence * 100).toFixed(1)}%</span>
+            </div>
+            {scanData.extractedText && (
+              <div className="mt-2">
+                <span className="block mb-1">Detected Text:</span>
+                <span className="text-primary font-medium italic">"{scanData.extractedText}"</span>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Action Buttons */}

@@ -60,6 +60,11 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
 3. **Reading History**: Previous scans stored in database → Retrieved and displayed in recent readings component
 
 ## Recent Changes
+- **July 20, 2025**: Removed training interface and simplified app for deployment
+  - Removed scanner trainer functionality as requested by user
+  - Cleaned up training-related components and interfaces
+  - Simplified recognition system to focus on core card identification
+  - Prepared app for production deployment with clean, streamlined interface
 - **July 19, 2025**: Complete deck transformation and organization
   - Replaced all 78 tarot cards with enhanced sensual/erotic themed artwork
   - Updated entire Major Arcana (22 cards) and all four Minor Arcana suits
