@@ -192,19 +192,36 @@ function findByPixelAnalysis(imageData: string, allCards: TarotCard[]): OfflineR
 }
 
 function selectCardByProbability(allCards: TarotCard[]): OfflineResult | null {
-  // Weight cards by common reading frequencies
-  const weights: Record<string, number> = {
-    'Major': 2.0, // Major Arcana more likely in readings
-    'Cups': 1.2,  // Emotional cards common
-    'Wands': 1.1,  // Action cards common
-    'Swords': 0.9, // Challenge cards less frequent
-    'Pentacles': 1.0 // Material cards average
+  // Enhanced probability system with better card distribution
+  const suitWeights: Record<string, number> = {
+    'Major': 1.5, // Major Arcana appear frequently in readings
+    'Cups': 1.2,  // Emotional/relationship cards common
+    'Wands': 1.1,  // Action/passion cards moderately common
+    'Swords': 1.0, // Mental/challenge cards average frequency
+    'Pentacles': 1.1 // Material/work cards moderately common
   };
   
-  const weightedCards: { card: TarotCard; weight: number }[] = allCards.map(card => ({
-    card,
-    weight: weights[card.arcana] || 1.0
-  }));
+  // Court cards and specific numbers have different frequencies
+  const typeWeights: Record<string, number> = {
+    'ace': 1.3, '2': 1.0, '3': 1.0, '4': 0.9, '5': 0.9,
+    '6': 1.1, '7': 1.0, '8': 0.9, '9': 0.9, '10': 1.2,
+    'page': 1.1, 'knight': 1.0, 'queen': 1.2, 'king': 1.1
+  };
+  
+  const weightedCards: { card: TarotCard; weight: number }[] = allCards.map(card => {
+    let weight = suitWeights[card.arcana] || 1.0;
+    
+    // Add type-specific weighting
+    const cardName = card.name.toLowerCase();
+    for (const [type, typeWeight] of Object.entries(typeWeights)) {
+      if (cardName.includes(type)) {
+        weight *= typeWeight;
+        break;
+      }
+    }
+    
+    return { card, weight };
+  });
   
   // Select weighted random card
   const totalWeight = weightedCards.reduce((sum, item) => sum + item.weight, 0);

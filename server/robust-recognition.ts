@@ -6,6 +6,7 @@ import { googleVisionRecognition } from "./google-vision-recognition";
 import { webOCRRecognition } from "./web-ocr-recognition";
 import { openaiVisionRecognition } from "./openai-recognition";
 import { offlineRecognition } from "./offline-recognition";
+import { enhancedOfflineRecognition } from "./enhanced-offline-recognition";
 
 interface RobustRecognitionResult {
   card: TarotCard;
@@ -31,35 +32,21 @@ export async function robustCardRecognition(imageData: string): Promise<RobustRe
     return trainingResult;
   }
 
-  // Strategy 2: Google Vision API (Primary with unrestricted key)
-  const googleResult = await googleVisionRecognition(imageData, allCards);
-  if (googleResult && googleResult.confidence > 0.8) {
-    console.log(`✅ GOOGLE VISION MATCH: ${googleResult.card.name} (${googleResult.confidence})`);
-    return googleResult;
+  // Strategy 2: Enhanced offline recognition (Primary method)
+  const enhancedOfflineResult = await enhancedOfflineRecognition(imageData, allCards);
+  if (enhancedOfflineResult && enhancedOfflineResult.confidence > 0.6) {
+    console.log(`✅ ENHANCED OFFLINE MATCH: ${enhancedOfflineResult.card.name} (${enhancedOfflineResult.confidence})`);
+    return enhancedOfflineResult;
   }
 
-  // Strategy 2b: Web OCR (Backup text recognition)  
-  const webOCRResult = await webOCRRecognition(imageData, allCards);
-  if (webOCRResult && webOCRResult.confidence > 0.8) {
-    console.log(`✅ WEB OCR MATCH: ${webOCRResult.card.name} (${webOCRResult.confidence})`);
-    return webOCRResult;
-  }
-
-  // Strategy 2c: OpenAI Vision (Additional AI backup)
-  const openaiResult = await openaiVisionRecognition(imageData, allCards);
-  if (openaiResult && openaiResult.confidence > 0.7) {
-    console.log(`✅ OPENAI VISION MATCH: ${openaiResult.card.name} (${openaiResult.confidence})`);
-    return openaiResult;
-  }
-
-  // Strategy 3: Offline pattern recognition (no external APIs)
+  // Strategy 2b: Standard offline recognition (Secondary)
   const offlineResult = await offlineRecognition(imageData, allCards);
-  if (offlineResult && offlineResult.confidence > 0.7) {
+  if (offlineResult && offlineResult.confidence > 0.6) {
     console.log(`✅ OFFLINE RECOGNITION MATCH: ${offlineResult.card.name} (${offlineResult.confidence})`);
     return offlineResult;
   }
 
-  // Strategy 3b: Advanced Visual Recognition (Color Analysis)
+  // Strategy 3: Advanced Visual Recognition (Color Analysis)
   const visualResult = await visualCardRecognition(imageData, allCards);
   if (visualResult && visualResult.confidence > 0.6) {
     console.log(`✅ VISUAL RECOGNITION MATCH: ${visualResult.card.name} (${visualResult.confidence})`);
