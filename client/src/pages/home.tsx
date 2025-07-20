@@ -67,18 +67,18 @@ export default function Home() {
   return (
     <div className="min-h-screen ethereal-gradient">
       {/* Header */}
-      <header className="relative z-10 px-4 py-6">
+      <header className="relative z-10 px-4 py-3">
         <div className="max-w-md mx-auto">
           {/* Navigation Menu */}
-          <div className="flex justify-start mb-4">
+          <div className="flex justify-start mb-2">
             <NavigationMenu />
           </div>
           {/* Centered Logo */}
-          <div className="flex justify-center">
+          <div className="flex justify-center -mt-2">
             <img 
               src={tarotopiaLogo} 
               alt="Tarotopia Logo" 
-              className="w-36 h-36 object-contain"
+              className="w-32 h-32 object-contain"
             />
           </div>
         </div>
