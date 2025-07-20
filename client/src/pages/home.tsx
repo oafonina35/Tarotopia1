@@ -22,9 +22,17 @@ export default function Home() {
   const [showRecognitionOptions, setShowRecognitionOptions] = useState<boolean>(false);
   const [lastScannedImage, setLastScannedImage] = useState<string>('');
   const [scanResult, setScanResult] = useState<{
+    imageData: string;
     confidence: number;
     isLearned: boolean;
     method: string;
+    extractedText?: string;
+    fallbackResults?: Array<{
+      method: string;
+      card?: TarotCard;
+      confidence: number;
+      extractedText?: string;
+    }>;
   } | null>(null);
 
   const handleScanComplete = (card: TarotCard, reading: CardReading, scanData?: {
@@ -32,16 +40,19 @@ export default function Home() {
     confidence: number;
     isLearned: boolean;
     method: string;
+    extractedText?: string;
+    fallbackResults?: Array<{
+      method: string;
+      card?: TarotCard;
+      confidence: number;
+      extractedText?: string;
+    }>;
   }) => {
     setRecognizedCard(card);
     setCurrentReading(reading);
     if (scanData) {
       setLastScannedImage(scanData.imageData);
-      setScanResult({
-        confidence: scanData.confidence,
-        isLearned: scanData.isLearned,
-        method: scanData.method
-      });
+      setScanResult(scanData);
     }
     setScanningState('result');
   };
@@ -140,6 +151,7 @@ export default function Home() {
                 card={recognizedCard}
                 reading={currentReading}
                 onScanAnother={handleScanAnother}
+                scanData={scanResult}
               />
               
               {/* Training Interface */}

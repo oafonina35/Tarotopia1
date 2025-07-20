@@ -1,14 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { Star, Heart, RefreshCw } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
+import RecognitionDetails from "./recognition-details";
 
 interface CardResultProps {
   card: TarotCard;
   reading: CardReading | null;
   onScanAnother: () => void;
+  scanData?: {
+    imageData: string;
+    confidence: number;
+    isLearned: boolean;
+    method: string;
+    extractedText?: string;
+    fallbackResults?: Array<{
+      method: string;
+      card?: TarotCard;
+      confidence: number;
+      extractedText?: string;
+    }>;
+  };
 }
 
-export default function CardResult({ card, reading, onScanAnother }: CardResultProps) {
+export default function CardResult({ card, reading, onScanAnother, scanData }: CardResultProps) {
   const handleSaveReading = () => {
     // In a real app, this would save to favorites or a personal collection
     console.log('Saving reading for card:', card.name);
@@ -94,6 +108,17 @@ export default function CardResult({ card, reading, onScanAnother }: CardResultP
 
 
       </div>
+
+      {/* Recognition Details */}
+      {scanData && (
+        <RecognitionDetails
+          confidence={scanData.confidence}
+          method={scanData.method}
+          isLearned={scanData.isLearned}
+          extractedText={scanData.extractedText}
+          fallbackResults={scanData.fallbackResults}
+        />
+      )}
 
       {/* Action Buttons */}
       <div className="mt-6 pt-4 border-t border-accent/30">

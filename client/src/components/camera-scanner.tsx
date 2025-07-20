@@ -16,6 +16,13 @@ interface CameraScannerProps {
     confidence: number;
     isLearned: boolean;
     method: string;
+    extractedText?: string;
+    fallbackResults?: Array<{
+      method: string;
+      card?: TarotCard;
+      confidence: number;
+      extractedText?: string;
+    }>;
   }) => void;
   onScanError: (error: string) => void;
 }
@@ -26,6 +33,13 @@ interface RecognitionResponse {
   confidence: number;
   isLearned: boolean;
   method: string;
+  extractedText?: string;
+  fallbackResults?: Array<{
+    method: string;
+    card?: TarotCard;
+    confidence: number;
+    extractedText?: string;
+  }>;
 }
 
 export default function CameraScanner({ 
@@ -52,11 +66,13 @@ export default function CameraScanner({
         imageData,
         confidence: data.confidence,
         isLearned: data.isLearned,
-        method: data.method
+        method: data.method,
+        extractedText: data.extractedText,
+        fallbackResults: data.fallbackResults
       });
       toast({
         title: "Card Recognized!",
-        description: `Identified as "${data.card.name}" with ${Math.round(data.confidence * 100)}% confidence.`,
+        description: `Identified as "${data.card.name}" with ${Math.round(data.confidence * 100)}% confidence using ${data.method.replace('-', ' ')} method.`,
       });
     },
     onError: (error) => {
