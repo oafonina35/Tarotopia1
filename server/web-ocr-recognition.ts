@@ -56,7 +56,7 @@ async function callOCRSpaceAPI(imageData: string): Promise<string> {
     const response = await fetch('https://api.ocr.space/parse/image', {
       method: 'POST',
       headers: {
-        'apikey': 'helloworld', // Free API key
+        'apikey': 'c01c2c6b892e95d8d9d82016dd11fdcc6ca36c09', // Your OCR.space API key
       },
       body: formData
     });
