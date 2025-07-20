@@ -1,6 +1,7 @@
 import type { TarotCard } from "@shared/schema";
 import { db } from "./db";
 import { tarotCards } from "@shared/schema";
+import { visualCardRecognition } from "./visual-card-recognition";
 
 interface RobustRecognitionResult {
   card: TarotCard;
@@ -26,22 +27,19 @@ export async function robustCardRecognition(imageData: string): Promise<RobustRe
     return trainingResult;
   }
 
-  // Strategy 2: Enhanced Tesseract OCR with better preprocessing
-  const tesseractResult = await enhancedTesseractOCR(imageData, allCards);
-  if (tesseractResult && tesseractResult.confidence > 0.7) {
-    console.log(`✅ TESSERACT MATCH: ${tesseractResult.card.name} (${tesseractResult.confidence})`);
-    return tesseractResult;
-  }
-
-  // Strategy 3: Image pattern analysis (visual features)
-  const visualResult = await visualPatternRecognition(imageData, allCards);
+  // Strategy 2: Advanced Visual Recognition (Color + OpenAI Vision)
+  const visualResult = await visualCardRecognition(imageData, allCards);
   if (visualResult && visualResult.confidence > 0.6) {
-    console.log(`✅ VISUAL PATTERN MATCH: ${visualResult.card.name} (${visualResult.confidence})`);
+    console.log(`✅ VISUAL RECOGNITION MATCH: ${visualResult.card.name} (${visualResult.confidence})`);
     return visualResult;
   }
 
+  // Strategy 3: Enhanced Tesseract OCR (disabled due to stability issues)
+  // const tesseractResult = await enhancedTesseractOCR(imageData, allCards);
+  console.log('⚠️ Tesseract OCR skipped for stability');
+
   // Strategy 4: Combination approach with weighted scoring
-  const combinedResult = await combinedRecognitionApproach([trainingResult, tesseractResult, visualResult]);
+  const combinedResult = await combinedRecognitionApproach([trainingResult, visualResult]);
   if (combinedResult && combinedResult.confidence > 0.5) {
     console.log(`✅ COMBINED MATCH: ${combinedResult.card.name} (${combinedResult.confidence})`);
     return combinedResult;

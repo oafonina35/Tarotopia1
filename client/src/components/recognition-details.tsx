@@ -14,6 +14,12 @@ interface RecognitionDetailsProps {
     confidence: number;
     extractedText?: string;
   }>;
+  colorScheme?: {
+    dominant: string;
+    secondary: string;
+    accent: string;
+    brightness: number;
+  };
 }
 
 export default function RecognitionDetails({
@@ -21,7 +27,8 @@ export default function RecognitionDetails({
   method,
   isLearned,
   extractedText,
-  fallbackResults = []
+  fallbackResults = [],
+  colorScheme
 }: RecognitionDetailsProps) {
   
   const getMethodIcon = (methodName: string) => {
@@ -47,12 +54,13 @@ export default function RecognitionDetails({
       'tesseract': 'Tesseract OCR',
       'free-ocr': 'Free OCR',
       'openai-vision': 'AI Vision',
+      'color-analysis': 'Color Analysis',
+      'visual-pattern': 'Visual Pattern',
       'ensemble': 'Ensemble Method',
-      'advanced-pattern': 'Advanced Pattern',
-      'visual-similarity': 'Visual Similarity',
-      'pattern-based': 'Pattern Matching',
-      'fallback-tesseract': 'Fallback: Tesseract',
-      'fallback-free-ocr': 'Fallback: Free OCR'
+      'combined': 'Combined Analysis',
+      'intelligent-fallback': 'Smart Selection',
+      'enhanced-tesseract': 'Enhanced OCR',
+      'pattern-based': 'Pattern Matching'
     };
     return names[methodName] || methodName.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
@@ -153,6 +161,48 @@ export default function RecognitionDetails({
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Color Scheme Analysis */}
+        {colorScheme && (
+          <div className="space-y-3">
+            <div className="font-medium flex items-center gap-2">
+              🎨 Color Analysis
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="text-center">
+                <div 
+                  className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white shadow-sm" 
+                  style={{ backgroundColor: colorScheme.dominant }}
+                />
+                <div className="text-xs text-muted-foreground">Dominant</div>
+                <div className="text-xs font-mono">{colorScheme.dominant}</div>
+              </div>
+              <div className="text-center">
+                <div 
+                  className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white shadow-sm" 
+                  style={{ backgroundColor: colorScheme.secondary }}
+                />
+                <div className="text-xs text-muted-foreground">Secondary</div>
+                <div className="text-xs font-mono">{colorScheme.secondary}</div>
+              </div>
+              <div className="text-center">
+                <div 
+                  className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white shadow-sm" 
+                  style={{ backgroundColor: colorScheme.accent }}
+                />
+                <div className="text-xs text-muted-foreground">Accent</div>
+                <div className="text-xs font-mono">{colorScheme.accent}</div>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border">
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Brightness Level</span>
+                <span className="text-sm font-medium">{Math.round(colorScheme.brightness * 100)}%</span>
+              </div>
+              <Progress value={colorScheme.brightness * 100} className="h-2 mt-2" />
             </div>
           </div>
         )}

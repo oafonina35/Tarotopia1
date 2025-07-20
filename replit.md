@@ -1,8 +1,8 @@
-# Mystic Scanner - Tarot Card Recognition App
+# Tarotopia - Mystical Tarot Card Scanner
 
 ## Overview
 
-Mystic Scanner is a web application that allows users to scan and identify tarot cards using image recognition technology. The app provides detailed information about recognized cards including meanings, symbolism, and guidance. It features a modern, mystical-themed UI with a focus on mobile-first design.
+Tarotopia is a mystical web application that allows users to scan and identify tarot cards using advanced visual recognition technology including color analysis and card name detection. The app provides detailed information about recognized cards including meanings, symbolism, and guidance. It features a modern, mystical-themed UI with a focus on mobile-first design.
 
 ## User Preferences
 

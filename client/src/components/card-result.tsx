@@ -13,6 +13,12 @@ interface CardResultProps {
     isLearned: boolean;
     method: string;
     extractedText?: string;
+    colorScheme?: {
+      dominant: string;
+      secondary: string;
+      accent: string;
+      brightness: number;
+    };
     fallbackResults?: Array<{
       method: string;
       card?: TarotCard;
@@ -117,6 +123,7 @@ export default function CardResult({ card, reading, onScanAnother, scanData }: C
           isLearned={scanData.isLearned}
           extractedText={scanData.extractedText}
           fallbackResults={scanData.fallbackResults}
+          colorScheme={scanData.colorScheme}
         />
       )}
 
