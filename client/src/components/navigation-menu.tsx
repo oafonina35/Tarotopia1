@@ -27,7 +27,7 @@ export default function NavigationMenu() {
       </SheetTrigger>
       <SheetContent side="left" className="w-80 bg-gradient-to-br from-teal-50 to-rose-50 border-r-teal-200">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-teal-700">Menu</h2>
+          <h2 className="text-xl font-semibold text-teal-700">Navigation Menu</h2>
         </div>
         
         <div className="space-y-4">
