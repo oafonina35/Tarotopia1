@@ -7,7 +7,7 @@ import NavigationMenu from "@/components/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Star, BookOpen } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
-import tarotopiaLogo from "@assets/Tarotopia-01_1752963540547.png";
+import tarotopiaLogo from "@assets/Tarotopia-01_1752986772341.png";
 
 type ScanningState = 'ready' | 'scanning' | 'processing' | 'result' | 'error';
 

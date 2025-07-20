@@ -8,7 +8,7 @@ import { Star, Shuffle, Calendar } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { TarotCard, CardReading } from "@shared/schema";
-import tarotopiaLogo from "@assets/Tarotopia-01_1752963540547.png";
+import tarotopiaLogo from "@assets/Tarotopia-01_1752986772341.png";
 import cardBackImage from "@assets/70x120 mm, cover_1752965274499.jpg";
 
 export default function DailyCard() {
