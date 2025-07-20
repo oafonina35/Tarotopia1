@@ -67,7 +67,7 @@ export default function Home() {
   return (
     <div className="min-h-screen ethereal-gradient">
       {/* Header */}
-      <header className="relative z-10 px-4 py-3">
+      <header className="relative z-0 px-4 py-3">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between">
             {/* Navigation Menu */}
@@ -85,7 +85,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 px-4 pb-8">
+      <main className="relative z-0 px-4 pb-8">
         <div className="max-w-md mx-auto">
           
           {/* Welcome Section */}

@@ -49,20 +49,24 @@ export default function NavigationMenu() {
       {/* Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          style={{ backdropFilter: 'blur(4px)' }}
+          className="fixed inset-0 bg-black bg-opacity-50"
+          style={{ 
+            backdropFilter: 'blur(4px)',
+            zIndex: 9998
+          }}
         />
       )}
 
       {/* Sliding Menu */}
       <div
         ref={menuRef}
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
+        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{
           background: 'linear-gradient(135deg, #f0fdfa 0%, #fdf2f8 100%)',
-          borderRight: '2px solid #5eead4'
+          borderRight: '2px solid #5eead4',
+          zIndex: 9999
         }}
       >
         {/* Header */}
