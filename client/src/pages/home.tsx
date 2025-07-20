@@ -73,7 +73,7 @@ export default function Home() {
             {/* Navigation Menu */}
             <NavigationMenuV2 />
             {/* Centered Logo */}
-            <div className="flex-1 flex justify-center -ml-8">
+            <div className="flex-1 flex justify-center -ml-16">
               <img 
                 src={tarotopiaLogo} 
                 alt="Tarotopia Logo" 
