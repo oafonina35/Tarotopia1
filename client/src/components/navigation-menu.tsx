@@ -22,7 +22,7 @@ export default function NavigationMenu() {
       <Button
         variant="outline"
         size="icon"
-        className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white relative z-50"
+        className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white relative z-[1001]"
         onClick={handleToggle}
       >
         <Menu className="h-4 w-4" />
@@ -31,14 +31,14 @@ export default function NavigationMenu() {
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/50 z-[999]"
           onClick={handleClose}
         />
       )}
 
       {/* Side Panel */}
       <div className={`
-        fixed top-0 left-0 h-full w-80 bg-gradient-to-br from-teal-50 to-rose-50 border-r-teal-200 shadow-lg z-50 transform transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 h-full w-80 bg-gradient-to-br from-teal-50 to-rose-50 border-r-teal-200 shadow-xl z-[1000] transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Header */}
