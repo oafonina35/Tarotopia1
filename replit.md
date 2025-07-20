@@ -60,7 +60,11 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
 3. **Reading History**: Previous scans stored in database → Retrieved and displayed in recent readings component
 
 ## Recent Changes
-- **July 20, 2025**: Removed training interface and simplified app for deployment
+- **July 20, 2025**: Successfully transferred project to Xcode for iOS App Store publishing
+  - Fixed navigation menu functionality with proper debugging
+  - Created complete project archive for Mac transfer
+  - User successfully opened project in Xcode and ready for App Store submission
+  - Removed training interface and simplified app for deployment
   - Removed scanner trainer functionality as requested by user
   - Cleaned up training-related components and interfaces
   - Simplified recognition system to focus on core card identification
