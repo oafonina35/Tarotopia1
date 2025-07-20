@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import NavigationMenu from "@/components/navigation-menu";
 import { Search } from "lucide-react";
 import type { TarotCard } from "@shared/schema";
-import tarotopiaLogo from "@assets/Tarotopia-01_1752963540547.png";
+import tarotopiaLogo from "@assets/Tarotopia-01_1752986772341.png";
 
 export default function CardMeanings() {
   const [searchTerm, setSearchTerm] = useState("");
