@@ -65,8 +65,13 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
   - Created complete project archive for Mac transfer
   - Resolved archive extraction issues and created manual download guides
   - Provided share link method for file transfer: https://replit.com/@afina238/Tarotopia
-  - Fixed navigation menu with custom implementation using pure CSS transforms and React state
+  - **Navigation Menu Fixed**: Resolved persistent z-index layering issues using React Portal implementation
+    - Created NavigationMenuV2 component using createPortal() to render menu at document.body level
+    - Used maximum z-index (2147483647) to ensure menu appears above all content
+    - Menu now properly covers all background elements including buttons and camera interface
+    - Full functionality restored: hamburger button opens menu, all navigation links work properly
   - User successfully opened project in Xcode and ready for App Store submission
+  - **Project Cleanup**: Removed 102 unused PNG card images, updated all logo imports to use new Tarotopia logo
   - Removed training interface and simplified app for deployment
   - Removed scanner trainer functionality as requested by user
   - Cleaned up training-related components and interfaces
