@@ -68,9 +68,8 @@ export default function Home() {
     <div className="min-h-screen ethereal-gradient">
       {/* Header */}
       <header className="relative z-10 px-4 py-6">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <NavigationMenu />
-          <div className="flex-1 flex justify-center">
+        <div className="max-w-md mx-auto">
+          <div className="flex justify-center">
             <img 
               src={tarotopiaLogo} 
               alt="Tarotopia Logo" 
