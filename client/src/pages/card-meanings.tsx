@@ -61,7 +61,7 @@ export default function CardMeanings() {
       <header className="relative z-10 px-4 py-6">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <NavigationMenuV2 />
-          <div className="flex-1 flex justify-center">
+          <div className="flex-1 flex justify-center -ml-8">
             <img 
               src={tarotopiaLogo} 
               alt="Tarotopia Logo" 
