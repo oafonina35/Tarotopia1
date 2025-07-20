@@ -4,8 +4,6 @@ import CardResult from "@/components/card-result";
 import RecentReadings from "@/components/recent-readings";
 import ManualCardSelector from "@/components/manual-card-selector";
 import NavigationMenu from "@/components/navigation-menu";
-import { TrainingInterface } from "@/components/training-interface";
-import RecognitionOptions from "@/components/recognition-options";
 import { Button } from "@/components/ui/button";
 import { Star, BookOpen } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
@@ -19,39 +17,22 @@ export default function Home() {
   const [currentReading, setCurrentReading] = useState<CardReading | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [showManualSelector, setShowManualSelector] = useState<boolean>(false);
-  const [showRecognitionOptions, setShowRecognitionOptions] = useState<boolean>(false);
-  const [lastScannedImage, setLastScannedImage] = useState<string>('');
   const [scanResult, setScanResult] = useState<{
     imageData: string;
     confidence: number;
-    isLearned: boolean;
     method: string;
     extractedText?: string;
-    fallbackResults?: Array<{
-      method: string;
-      card?: TarotCard;
-      confidence: number;
-      extractedText?: string;
-    }>;
   } | null>(null);
 
   const handleScanComplete = (card: TarotCard, reading: CardReading, scanData?: {
     imageData: string;
     confidence: number;
-    isLearned: boolean;
     method: string;
     extractedText?: string;
-    fallbackResults?: Array<{
-      method: string;
-      card?: TarotCard;
-      confidence: number;
-      extractedText?: string;
-    }>;
   }) => {
     setRecognizedCard(card);
     setCurrentReading(reading);
     if (scanData) {
-      setLastScannedImage(scanData.imageData);
       setScanResult(scanData);
     }
     setScanningState('result');
@@ -67,7 +48,6 @@ export default function Home() {
     setCurrentReading(null);
     setErrorMessage('');
     setShowManualSelector(false);
-    setLastScannedImage('');
     setScanResult(null);
     setScanningState('ready');
   };
@@ -154,18 +134,7 @@ export default function Home() {
                 scanData={scanResult}
               />
               
-              {/* Training Interface */}
-              {scanResult && (
-                <div className="mt-6">
-                  <TrainingInterface
-                    scannedImage={lastScannedImage}
-                    currentCard={recognizedCard}
-                    confidence={scanResult.confidence}
-                    isLearned={scanResult.isLearned}
-                    method={scanResult.method}
-                  />
-                </div>
-              )}
+              {/* Training Interface Removed */}
             </>
           )}
 
@@ -203,12 +172,6 @@ export default function Home() {
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-center space-x-6 text-sm text-gray-400">
             <button className="hover:text-mystic-gold transition-colors duration-200">About</button>
-            <button 
-              onClick={() => setShowRecognitionOptions(true)}
-              className="hover:text-mystic-gold transition-colors duration-200"
-            >
-              Recognition Options
-            </button>
             <button className="hover:text-mystic-gold transition-colors duration-200">Settings</button>
           </div>
           <p className="text-center text-xs text-gray-500 mt-3">
@@ -217,14 +180,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Recognition Options Modal */}
-      {showRecognitionOptions && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <RecognitionOptions onClose={() => setShowRecognitionOptions(false)} />
-          </div>
-        </div>
-      )}
+      {/* Recognition Options Modal Removed */}
     </div>
   );
 }
