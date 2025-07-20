@@ -46,12 +46,14 @@ export async function googleVisionRecognition(imageData: string, allCards: Tarot
 async function callGoogleVisionAPI(base64Image: string): Promise<string> {
   try {
     // Use Google Cloud Vision API REST endpoint
-    const apiKey = process.env.GOOGLE_VISION_API_KEY;
+    const apiKey = process.env.GOOGLE_VISION_API_KEY || 'AIzaSyCfdz9BsuyL3wLrHagH7BtH-TatgxiCRjY';
     
-    if (!apiKey) {
+    if (!apiKey || apiKey === 'not_set') {
       console.log('⚠️ Google Vision API key not provided, using fallback OCR');
       return await fallbackOCR(base64Image);
     }
+    
+    console.log(`🔑 Using Google Vision API key: ${apiKey.substring(0, 10)}...`);
     
     const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`, {
       method: 'POST',
