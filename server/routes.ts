@@ -5,7 +5,7 @@ import { insertCardReadingSchema, insertTarotCardSchema } from "@shared/schema";
 import { recognizeCardByText } from "./text-recognition";
 import { recognizeWithTraining, trainCard, getTrainingStats } from "./manual-training-recognition";
 import { advancedImageRecognition, RECOGNITION_OPTIONS } from "./advanced-recognition";
-import { enhancedRecognitionV2 } from "./enhanced-recognition-v2";
+import { robustCardRecognition } from "./robust-recognition";
 import { recognizeWithFreeOCR } from "./free-ocr-recognition";
 import { recognizeWithTesseract } from "./unlimited-ocr";
 import { z } from "zod";
@@ -63,9 +63,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No cards available for recognition" });
       }
 
-      // Use Enhanced Recognition V2 System (6-layer intelligent recognition)
-      console.log('🚀 Starting Enhanced Recognition V2 System...');
-      const recognitionResult = await enhancedRecognitionV2(imageData, allCards);
+      // Use Robust Recognition System
+      console.log('🚀 Starting Robust Recognition System...');
+      const recognitionResult = await robustCardRecognition(imageData);
       const recognizedCard = recognitionResult.card;
       
       if (!recognizedCard) {
@@ -87,7 +87,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         reading: reading,
         confidence: recognitionResult.confidence,
         isLearned: recognitionResult.isLearned || false,
-        method: recognitionResult.method || (recognitionResult.isLearned ? 'learned' : 'pattern-based')
+        method: recognitionResult.method || (recognitionResult.isLearned ? 'learned' : 'pattern-based'),
+        extractedText: recognitionResult.extractedText
       });
     } catch (error) {
       console.error("Error recognizing card:", error);
