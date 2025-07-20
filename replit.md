@@ -63,6 +63,8 @@ Manual card selection: Keep "Choose Card Manually" button permanently visible fo
 - **July 20, 2025**: Successfully transferred project to Xcode for iOS App Store publishing
   - Fixed navigation menu functionality with proper debugging
   - Created complete project archive for Mac transfer
+  - Resolved archive extraction issues and created manual download guides
+  - Provided share link method for file transfer: https://replit.com/@afina238/Tarotopia
   - User successfully opened project in Xcode and ready for App Store submission
   - Removed training interface and simplified app for deployment
   - Removed scanner trainer functionality as requested by user
