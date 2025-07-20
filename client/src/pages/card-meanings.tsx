@@ -140,14 +140,7 @@ export default function CardMeanings() {
                           
 
                           
-                          {card.keywords && (
-                            <div>
-                              <h4 className="font-medium text-teal-600 mb-1">Keywords:</h4>
-                              <p className="text-sm text-slate-600">
-                                {card.keywords}
-                              </p>
-                            </div>
-                          )}
+
                         </div>
                       </div>
                     </CardContent>

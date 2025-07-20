@@ -177,14 +177,7 @@ export default function DailyCard() {
                       </div>
                     )}
                     
-                    {currentCard.keywords && (
-                      <div className="text-left max-w-2xl mx-auto">
-                        <h5 className="font-semibold text-teal-600 mb-2">Focus Areas:</h5>
-                        <p className="text-sm text-slate-600">
-                          {currentCard.keywords}
-                        </p>
-                      </div>
-                    )}
+
                   </div>
                 </div>
                 
