@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -7,11 +7,30 @@ import { Menu, Camera, BookOpen, Star } from "lucide-react";
 
 export default function NavigationMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleClick = () => {
     console.log("Menu button clicked, current isOpen:", isOpen);
     setIsOpen(!isOpen);
   };
+
+  // Don't render Sheet until mounted to avoid hydration issues
+  if (!mounted) {
+    return (
+      <Button
+        variant="outline"
+        size="icon"
+        className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white"
+        onClick={() => {}}
+      >
+        <Menu className="h-4 w-4" />
+      </Button>
+    );
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
