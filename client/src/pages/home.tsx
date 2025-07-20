@@ -3,7 +3,7 @@ import CameraScanner from "@/components/camera-scanner";
 import CardResult from "@/components/card-result";
 import RecentReadings from "@/components/recent-readings";
 import ManualCardSelector from "@/components/manual-card-selector";
-import NavigationMenu from "@/components/navigation-menu";
+import NavigationMenuV2 from "@/components/navigation-menu-v2";
 import { Button } from "@/components/ui/button";
 import { Star, BookOpen } from "lucide-react";
 import type { TarotCard, CardReading } from "@shared/schema";
@@ -71,7 +71,7 @@ export default function Home() {
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between">
             {/* Navigation Menu */}
-            <NavigationMenu />
+            <NavigationMenuV2 />
             {/* Centered Logo */}
             <div className="flex-1 flex justify-center -ml-8">
               <img 

@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import NavigationMenu from "@/components/navigation-menu";
+import NavigationMenuV2 from "@/components/navigation-menu-v2";
 import { Star, Shuffle, Calendar } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -73,7 +73,7 @@ export default function DailyCard() {
       {/* Header */}
       <header className="relative z-10 px-4 py-6">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <NavigationMenu />
+          <NavigationMenuV2 />
           <div className="flex-1 flex justify-center">
             <img 
               src={tarotopiaLogo} 
