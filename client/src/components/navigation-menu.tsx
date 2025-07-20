@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { Link } from "wouter";
 import { Menu, Camera, BookOpen, Star } from "lucide-react";
 
@@ -20,11 +20,11 @@ export default function NavigationMenu() {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-80 bg-gradient-to-br from-teal-50 to-rose-50 border-r-teal-200">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-teal-700">Navigation Menu</h2>
-        </div>
+        <SheetHeader>
+          <SheetTitle className="text-xl font-semibold text-teal-700">Navigation Menu</SheetTitle>
+        </SheetHeader>
         
-        <div className="space-y-4">
+        <div className="space-y-4 mt-6">
           <Link href="/" onClick={() => setIsOpen(false)}>
             <Card className="cursor-pointer hover:shadow-md transition-shadow border-teal-200 hover:border-teal-400">
               <CardContent className="p-4">
