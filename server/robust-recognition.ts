@@ -5,6 +5,7 @@ import { visualCardRecognition } from "./visual-card-recognition";
 import { googleVisionRecognition } from "./google-vision-recognition";
 import { webOCRRecognition } from "./web-ocr-recognition";
 import { openaiVisionRecognition } from "./openai-recognition";
+import { offlineRecognition } from "./offline-recognition";
 
 interface RobustRecognitionResult {
   card: TarotCard;
@@ -30,28 +31,35 @@ export async function robustCardRecognition(imageData: string): Promise<RobustRe
     return trainingResult;
   }
 
-  // Strategy 2: OpenAI Vision (Primary AI recognition)
-  const openaiResult = await openaiVisionRecognition(imageData, allCards);
-  if (openaiResult && openaiResult.confidence > 0.7) {
-    console.log(`✅ OPENAI VISION MATCH: ${openaiResult.card.name} (${openaiResult.confidence})`);
-    return openaiResult;
+  // Strategy 2: Google Vision API (Primary with unrestricted key)
+  const googleResult = await googleVisionRecognition(imageData, allCards);
+  if (googleResult && googleResult.confidence > 0.8) {
+    console.log(`✅ GOOGLE VISION MATCH: ${googleResult.card.name} (${googleResult.confidence})`);
+    return googleResult;
   }
 
-  // Strategy 2b: Web OCR (Backup text recognition)
+  // Strategy 2b: Web OCR (Backup text recognition)  
   const webOCRResult = await webOCRRecognition(imageData, allCards);
   if (webOCRResult && webOCRResult.confidence > 0.8) {
     console.log(`✅ WEB OCR MATCH: ${webOCRResult.card.name} (${webOCRResult.confidence})`);
     return webOCRResult;
   }
 
-  // Strategy 2c: Google Vision API (Additional backup)
-  const googleResult = await googleVisionRecognition(imageData, allCards);
-  if (googleResult && googleResult.confidence > 0.7) {
-    console.log(`✅ GOOGLE VISION MATCH: ${googleResult.card.name} (${googleResult.confidence})`);
-    return googleResult;
+  // Strategy 2c: OpenAI Vision (Additional AI backup)
+  const openaiResult = await openaiVisionRecognition(imageData, allCards);
+  if (openaiResult && openaiResult.confidence > 0.7) {
+    console.log(`✅ OPENAI VISION MATCH: ${openaiResult.card.name} (${openaiResult.confidence})`);
+    return openaiResult;
   }
 
-  // Strategy 3: Advanced Visual Recognition (Color Analysis)
+  // Strategy 3: Offline pattern recognition (no external APIs)
+  const offlineResult = await offlineRecognition(imageData, allCards);
+  if (offlineResult && offlineResult.confidence > 0.7) {
+    console.log(`✅ OFFLINE RECOGNITION MATCH: ${offlineResult.card.name} (${offlineResult.confidence})`);
+    return offlineResult;
+  }
+
+  // Strategy 3b: Advanced Visual Recognition (Color Analysis)
   const visualResult = await visualCardRecognition(imageData, allCards);
   if (visualResult && visualResult.confidence > 0.6) {
     console.log(`✅ VISUAL RECOGNITION MATCH: ${visualResult.card.name} (${visualResult.confidence})`);
@@ -59,7 +67,7 @@ export async function robustCardRecognition(imageData: string): Promise<RobustRe
   }
 
   // Strategy 4: Combination approach with weighted scoring
-  const combinedResult = await combinedRecognitionApproach([trainingResult, openaiResult, webOCRResult, googleResult, visualResult]);
+  const combinedResult = await combinedRecognitionApproach([trainingResult, offlineResult, openaiResult, webOCRResult, googleResult, visualResult]);
   if (combinedResult && combinedResult.confidence > 0.5) {
     console.log(`✅ COMBINED MATCH: ${combinedResult.card.name} (${combinedResult.confidence})`);
     return combinedResult;
@@ -293,11 +301,15 @@ async function combinedRecognitionApproach(results: (RobustRecognitionResult | n
   // Weight results by method reliability
   const methodWeights: Record<string, number> = {
     'training': 1.0,
+    'offline': 0.8,
     'openai-vision': 0.95,
     'web-ocr': 0.85,
     'google-vision': 0.9,
     'color-analysis': 0.7,
-    'visual-pattern': 0.6
+    'visual-pattern': 0.6,
+    'color-pattern': 0.75,
+    'pixel-hash': 0.6,
+    'probabilistic': 0.5
   };
   
   const cardScores: Record<string, { card: TarotCard; totalScore: number; count: number }> = {};
