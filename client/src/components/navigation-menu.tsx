@@ -1,56 +1,62 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link } from "wouter";
-import { Menu, Camera, BookOpen, Star } from "lucide-react";
+import { Menu, Camera, BookOpen, Star, X } from "lucide-react";
 
 export default function NavigationMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleClick = () => {
-    console.log("Menu button clicked, current isOpen:", isOpen);
+  const handleToggle = () => {
+    console.log("Menu button clicked, toggling isOpen:", !isOpen);
     setIsOpen(!isOpen);
   };
 
-  // Don't render Sheet until mounted to avoid hydration issues
-  if (!mounted) {
-    return (
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      {/* Menu Button */}
       <Button
         variant="outline"
         size="icon"
-        className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white"
-        onClick={() => {}}
+        className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white relative z-50"
+        onClick={handleToggle}
       >
         <Menu className="h-4 w-4" />
       </Button>
-    );
-  }
 
-  return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white"
-          onClick={handleClick}
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-80 bg-gradient-to-br from-teal-50 to-rose-50 border-r-teal-200">
-        <div className="flex items-center justify-between mb-6">
+      {/* Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={handleClose}
+        />
+      )}
+
+      {/* Side Panel */}
+      <div className={`
+        fixed top-0 left-0 h-full w-80 bg-gradient-to-br from-teal-50 to-rose-50 border-r-teal-200 shadow-lg z-50 transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-teal-200">
           <h2 className="text-xl font-semibold text-teal-700">Navigation Menu</h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleClose}
+            className="text-teal-600 hover:text-teal-800"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
         
-        <div className="space-y-4">
-          <Link href="/" onClick={() => setIsOpen(false)}>
+        {/* Menu Items */}
+        <div className="p-6 space-y-4">
+          <Link href="/" onClick={handleClose}>
             <Card className="cursor-pointer hover:shadow-md transition-shadow border-teal-200 hover:border-teal-400">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
@@ -64,7 +70,7 @@ export default function NavigationMenu() {
             </Card>
           </Link>
 
-          <Link href="/meanings" onClick={() => setIsOpen(false)}>
+          <Link href="/meanings" onClick={handleClose}>
             <Card className="cursor-pointer hover:shadow-md transition-shadow border-teal-200 hover:border-teal-400">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
@@ -78,7 +84,7 @@ export default function NavigationMenu() {
             </Card>
           </Link>
 
-          <Link href="/daily" onClick={() => setIsOpen(false)}>
+          <Link href="/daily" onClick={handleClose}>
             <Card className="cursor-pointer hover:shadow-md transition-shadow border-teal-200 hover:border-teal-400">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
@@ -92,7 +98,7 @@ export default function NavigationMenu() {
             </Card>
           </Link>
         </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   );
 }
