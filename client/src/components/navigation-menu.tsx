@@ -8,6 +8,11 @@ import { Menu, Camera, BookOpen, Star } from "lucide-react";
 export default function NavigationMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleClick = () => {
+    console.log("Menu button clicked, current isOpen:", isOpen);
+    setIsOpen(!isOpen);
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
@@ -15,6 +20,7 @@ export default function NavigationMenu() {
           variant="outline"
           size="icon"
           className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white"
+          onClick={handleClick}
         >
           <Menu className="h-4 w-4" />
         </Button>
