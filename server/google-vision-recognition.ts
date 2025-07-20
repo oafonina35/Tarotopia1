@@ -78,6 +78,8 @@ async function callGoogleVisionAPI(base64Image: string): Promise<string> {
     });
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.log(`Google Vision API error details: ${response.status} - ${errorText}`);
       throw new Error(`Google Vision API error: ${response.status}`);
     }
     

@@ -3,6 +3,7 @@ import { db } from "./db";
 import { tarotCards } from "@shared/schema";
 import { visualCardRecognition } from "./visual-card-recognition";
 import { googleVisionRecognition } from "./google-vision-recognition";
+import { webOCRRecognition } from "./web-ocr-recognition";
 
 interface RobustRecognitionResult {
   card: TarotCard;
@@ -28,7 +29,14 @@ export async function robustCardRecognition(imageData: string): Promise<RobustRe
     return trainingResult;
   }
 
-  // Strategy 2: Google Vision API for text recognition
+  // Strategy 2: Web OCR (Free alternative)
+  const webOCRResult = await webOCRRecognition(imageData, allCards);
+  if (webOCRResult && webOCRResult.confidence > 0.8) {
+    console.log(`✅ WEB OCR MATCH: ${webOCRResult.card.name} (${webOCRResult.confidence})`);
+    return webOCRResult;
+  }
+
+  // Strategy 2b: Google Vision API (if web OCR fails)
   const googleResult = await googleVisionRecognition(imageData, allCards);
   if (googleResult && googleResult.confidence > 0.7) {
     console.log(`✅ GOOGLE VISION MATCH: ${googleResult.card.name} (${googleResult.confidence})`);
@@ -43,7 +51,7 @@ export async function robustCardRecognition(imageData: string): Promise<RobustRe
   }
 
   // Strategy 4: Combination approach with weighted scoring
-  const combinedResult = await combinedRecognitionApproach([trainingResult, googleResult, visualResult]);
+  const combinedResult = await combinedRecognitionApproach([trainingResult, webOCRResult, googleResult, visualResult]);
   if (combinedResult && combinedResult.confidence > 0.5) {
     console.log(`✅ COMBINED MATCH: ${combinedResult.card.name} (${combinedResult.confidence})`);
     return combinedResult;
@@ -277,6 +285,7 @@ async function combinedRecognitionApproach(results: (RobustRecognitionResult | n
   // Weight results by method reliability
   const methodWeights: Record<string, number> = {
     'training': 1.0,
+    'web-ocr': 0.85,
     'google-vision': 0.9,
     'color-analysis': 0.7,
     'visual-pattern': 0.6,
