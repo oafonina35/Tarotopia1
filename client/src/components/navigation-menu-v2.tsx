@@ -20,7 +20,7 @@ export default function NavigationMenuV2() {
       <Button
         variant="outline"
         size="icon"
-        className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white relative z-50"
+        className="border-slate-600 bg-slate-700/80 text-slate-100 hover:bg-slate-600 hover:text-white relative z-[99998]"
         onClick={toggleMenu}
       >
         <Menu className="h-4 w-4" />
@@ -28,16 +28,16 @@ export default function NavigationMenuV2() {
 
       {/* Overlay and Menu */}
       {isOpen && (
-        <>
+        <div className="fixed inset-0 z-[99999]">
           {/* Full Screen Backdrop */}
           <div 
-            className="fixed inset-0 bg-black bg-opacity-60 z-[9998]"
+            className="absolute inset-0 bg-black bg-opacity-60"
             onClick={closeMenu}
             style={{ backdropFilter: 'blur(2px)' }}
           />
           
           {/* Sliding Menu Panel */}
-          <div className="fixed top-0 left-0 h-full w-80 bg-white z-[9999] shadow-2xl">
+          <div className="absolute top-0 left-0 h-full w-80 bg-white shadow-2xl">
             <div style={{
               background: 'linear-gradient(135deg, #f0fdfa 0%, #fdf2f8 100%)',
               height: '100%',
@@ -114,7 +114,7 @@ export default function NavigationMenuV2() {
               
             </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );
