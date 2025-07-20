@@ -69,17 +69,17 @@ export default function Home() {
       {/* Header */}
       <header className="relative z-10 px-4 py-3">
         <div className="max-w-md mx-auto">
-          {/* Navigation Menu */}
-          <div className="flex justify-start mb-2">
+          <div className="flex items-center justify-between">
+            {/* Navigation Menu */}
             <NavigationMenu />
-          </div>
-          {/* Centered Logo */}
-          <div className="flex justify-center -mt-2">
-            <img 
-              src={tarotopiaLogo} 
-              alt="Tarotopia Logo" 
-              className="w-32 h-32 object-contain"
-            />
+            {/* Centered Logo */}
+            <div className="flex-1 flex justify-center">
+              <img 
+                src={tarotopiaLogo} 
+                alt="Tarotopia Logo" 
+                className="w-36 h-36 object-contain"
+              />
+            </div>
           </div>
         </div>
       </header>
