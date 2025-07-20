@@ -30,7 +30,7 @@ export async function robustCardRecognition(imageData: string): Promise<RobustRe
 
   // Strategy 2: Google Vision API for text recognition
   const googleResult = await googleVisionRecognition(imageData, allCards);
-  if (googleResult && googleResult.confidence > 0.8) {
+  if (googleResult && googleResult.confidence > 0.7) {
     console.log(`✅ GOOGLE VISION MATCH: ${googleResult.card.name} (${googleResult.confidence})`);
     return googleResult;
   }
