@@ -212,7 +212,7 @@ export default function Home() {
             <button className="hover:text-mystic-gold transition-colors duration-200">Settings</button>
           </div>
           <p className="text-center text-xs text-gray-500 mt-3">
-            &copy; 2024 Mystic Scanner. Embrace the journey.
+            &copy; 2024 Tarotopia. Embrace the journey.
           </p>
         </div>
       </footer>
